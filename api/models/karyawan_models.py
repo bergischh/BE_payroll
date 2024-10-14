@@ -53,7 +53,7 @@ class Karyawan(models.Model):
     
 
     # Relasi ke tabel User
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='karyawan_profiles')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='karyawan_profiles')
 
     # Relasi ke tabel Departement
     department = models.ForeignKey(Departement, on_delete=models.CASCADE, related_name='karyawan_profiles')

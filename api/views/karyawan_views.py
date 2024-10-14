@@ -1,74 +1,91 @@
+from rest_framework import status
+from rest_framework import exceptions
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework import status
+from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.authentication import get_authorization_header
 from django.shortcuts import get_object_or_404
+
 from ..models.karyawan_models import Karyawan
 from ..models.user_models import User
-from ..serializers import KaryawanSerializer
-from rest_framework.authentication import get_authorization_header
-from rest_framework.exceptions import APIException, AuthenticationFailed
 from ..authentication import decode_access_token
-from rest_framework import exceptions
+from ..serializers import KaryawanSerializer
 
 
 class KaryawanViews(APIView):
     def get(self, request):
-        # Ambil token dari Authorization header
-        auth = get_authorization_header(request).split()
+        auth_header = request.headers.get('Authorization')
+        token = None
 
-        if auth and len(auth) == 2:
-            token = auth[1].decode('utf-8')
-            user_id = decode_access_token(token)  # Decode token untuk mendapatkan user_id
-            
-            # Ambil pengguna berdasarkan user_id
-            user = User.objects.filter(pk=user_id).first()
-            if user is None:
-                raise AuthenticationFailed('User not found')
+        if auth_header and auth_header.startswith('Bearer '):
+            token = auth_header.split(' ')[1]  
+        else:
+            token = request.COOKIES.get('accessToken')  
 
-            # Cek apakah user memiliki role admin atau manager
-            if user.role in ['admin', 'manager']:
-                # Jika role admin atau manager, ambil semua data karyawan
-                karyawan = Karyawan.objects.all()
-            else:
-                # Jika bukan, ambil hanya data karyawan milik pengguna tersebut
-                karyawan = Karyawan.objects.filter(user=user)
+        if not token:
+             return Response({
+                "error": "Token tidak ada, tolong masukkan token"
+            })
+        
+        try:
+            user_id = decode_access_token(token)
+        except exceptions.AuthenticationFailed as e:
+            return Response({
+                "error": "Anda tidak memiliki akses."
+            }, status=status.HTTP_401_UNAUTHORIZED)
 
-            serializer = KaryawanSerializer(karyawan, many=True)
-            return Response(serializer.data)
+        user = get_object_or_404(User, id=user_id)
 
-        raise AuthenticationFailed('unauthenticated')
+        if user.role in ['admin', 'manager']:
+            karyawan = Karyawan.objects.all()
+        elif user.role == 'karyawan':
+            karyawan = Karyawan.objects.filter(user=user)
+        else:
+            return Response({
+                "error": "Invalid user role"
+            }, status=status.HTTP_403_FORBIDDEN)
+
+        serializer = KaryawanSerializer(karyawan, many=True)
+        return Response(serializer.data)
+
     
 class KaryawanCreate(APIView):
    def post(self, request, *args, **kwrgs):
-       auth = get_authorization_header(request).split()
+       auth_header = request.headers.get('Authorization')
        token = None
 
-       if auth and len(auth) == 2 and auth[0].lower() == b'bearer':
-           token = auth[1].decode('utf-8')
+       if auth_header and auth_header.startswith('Bearer '):
+            token = auth_header.split(' ')[1]  
+       else:
+            token = request.COOKIES.get('accessToken')  
 
        if not token:
-           token = request.COOKIES.get('jwt')
-
-       if token:
-            try:
-                user_id = decode_access_token(token)  # Mendapatkan user_id dari token
-            except exceptions.AuthenticationFailed:
-                return Response({'error': 'Authentication required'}, status=401)
-       else:
-           return Response({'error': 'Token not provided'}, status=401)
+             return Response({
+                "error": "Token tidak ada, tolong masukkan token"
+            })
+        
+       try:
+            user_id = decode_access_token(token)
+       except exceptions.AuthenticationFailed as e:
+            return Response({
+                "error": "Anda tidak memiliki akses."
+            }, status=status.HTTP_401_UNAUTHORIZED)
        
-        # Ambil user berdasarkan user_id
-       user = User.objects.filter(id=user_id).first()
+       user = get_object_or_404(User, id=user_id) 
+
        if not user:
             return Response({'error': 'User not found'}, status=404)
 
-        # Parse data dari request
+       if user.role not in ['admin', 'manager'] :
+           return Response({
+                "error": "Invalid user role"
+            }, status=status.HTTP_403_FORBIDDEN)
+
        serializer = KaryawanSerializer(data=request.data)
        parser_classes = [MultiPartParser, FormParser]
 
        if serializer.is_valid():
-            # Set user secara otomatis ke dalam Karyawan
             serializer.save(user=user)
             return Response({
                 "message": "Berhasil menambah data karyawan",
@@ -81,32 +98,36 @@ class KaryawanCreate(APIView):
     
 class KaryawanUpdate(APIView):
     def put(self, request, *args, **kwargs):
-        auth = get_authorization_header(request).split()
+        auth_header = request.headers.get('Authorization')
+        token = None
 
-        if auth and len(auth) == 2:
-            token = auth[1].decode('utf-8')
-            user_id = decode_access_token(token)
-        else : 
-            raise AuthenticationFailed('unauthenticated')
+        if auth_header and auth_header.startswith('Bearer '):
+            token = auth_header.split(' ')[1]  
+        else:
+            token = request.COOKIES.get('accessToken')  
+
+        if not token:
+            return Response({
+                "error": "Token tidak ada, tolong masukkan token"
+            })
         
-        user = User.objects.filter(pk=user_id).first()
-        if user is None:
-            raise AuthenticationFailed('user not found')
+        try:
+            user_id = decode_access_token(token)
+        except exceptions.AuthenticationFailed:
+            return Response({
+                "error": "Anda tidak memiliki akses."
+            }, status=status.HTTP_401_UNAUTHORIZED)
+       
+        user = User.objects.filter(id=user_id).first()
         
         Karyawan_id = kwargs.get('id')
         employees = get_object_or_404(Karyawan, id=Karyawan_id)
 
-        if user.role in ['admin', 'manager']:
-            pass
-        elif user.role == 'karyawan':
-            if employees.user != user:
-                return Response({
-                    "error": "Anda tidak terdaftar untuk mengaupdate data ini" 
-                }, status=status.HTTP_403_FORBIDDEN)
-        else:
-            return Response({
-                "error": "invalid user role"
-            },status=status.HTTP_403_FORBIDDEN)
+        if user.role not in ['admin', 'manager'] :
+           return Response({
+                "error": "Invalid user role"
+            }, status=status.HTTP_403_FORBIDDEN)
+
         
         serializer = KaryawanSerializer(employees, data=request.data, partial=True)
         if serializer.is_valid():
@@ -120,12 +141,49 @@ class KaryawanUpdate(APIView):
         }, status=status.HTTP_400_BAD_REQUEST)
     
 class KaryawanDelete(APIView):
-    def delete(self, request, *args, **kwargs):
-        auth = get_authorization_header(request).split()
-        id = kwargs.get('id')
-        departments = get_object_or_404(Karyawan, id=id)
+    def put(self, request, *args, **kwargs):
 
-        departments.delete()
+        auth_header = request.headers.get('Authorization')
+        token = None
+
+        if auth_header and auth_header.startswith('Bearer '):
+            token = auth_header.split(' ')[1]  
+        else:
+            token = request.COOKIES.get('accessToken')  
+
+        if not token:
+            return Response({
+                "error": "Token tidak ada, tolong masukkan token"
+            })
+        
+        try:
+            user_id = decode_access_token(token)  
+        except exceptions.AuthenticationFailed:
+            return Response({
+                "error": "Anda tidak memiliki akses."
+            }, status=status.HTTP_401_UNAUTHORIZED)
+
+        user = get_object_or_404(User, id=user_id)
+        if user.role is None:
+            return Response({
+                "error": "Unauthorized. Only admin or manager can delete records."
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        karyawan_id = kwargs.get('id')
+        employees = get_object_or_404(Karyawan, id=karyawan_id)
+
+        if user.role not in ['admin', 'manager']:
+            return Response({
+                "error": "Unauthorized. Only admin or manager can delete records."
+            }, status=status.HTTP_403_FORBIDDEN)            
+
+        serializer = KaryawanSerializer(employees, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                "message" : "Berhasil update data",
+                "data" : serializer.data
+            }, status=status.HTTP_200_OK)
         return Response({
-            "message" : "Berhasil menghapus data"
-        }, status=status.HTTP_204_NO_CONTENT)
+            "errors" : serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)

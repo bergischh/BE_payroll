@@ -1,7 +1,7 @@
 from django.urls import path
 
 
-from .views.user_views import RegisterView, LoginView, UserAPIView, RefreshAPIView, LogoutView
+from .views.user_views import RegisterView, LoginView, UserAPIView, RefreshAPIView, LogoutView, UpdateUserView
 from .views.karyawan_views import KaryawanViews, KaryawanCreate, KaryawanUpdate, KaryawanDelete
 from .views.departement_views import DepartementView, DepartementCreate, DepartmentUpdate, DepartmentDelete
 from .views.calonkaryawan_views import CalonKaryawanView, CalonKaryawanCreate, CalonKaryawanUpdate, CalonKaryawanDelete
@@ -18,6 +18,7 @@ urlpatterns = [
     # user
     path('register/', RegisterView.as_view(), name='register-users'),  
     path('login/', LoginView.as_view(), name='login-users'),  
+    path('update-account/<int:id>/', UpdateUserView.as_view(), name='update-users'),  
     path('user/', UserAPIView.as_view(), name='users'),  
     path('refresh/', RefreshAPIView.as_view(), name='refresh-token'),
     path('logout/', LogoutView.as_view(), name='logout-users'),
@@ -82,6 +83,6 @@ urlpatterns = [
     path('update-transaction/<int:id>/', TransactionUpdate.as_view(), name='transaction-update'),
     path('delete-transaction/<int:id>/', TransactionDelete.as_view(), name='transaction-delete'), 
  
-
+    
 
 ]

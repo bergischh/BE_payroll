@@ -9,11 +9,12 @@ class User(AbstractUser):
         CALON_KARYAWAN = 'calon_karyawan', 'Calon Karyawan'
 
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=225)
+    # name = models.CharField(max_length=225)
     email = models.CharField(max_length=255, unique=True)
     role = models.CharField(max_length=50, choices=Role.choices, default=None)
     password = models.CharField(max_length=255)
-    username = None
+    username =  models.CharField(max_length=100, unique=True, null=True)
+
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []

@@ -1,8 +1,8 @@
 from django.db import models
-from .user_models import User
 from .tunjangan_models import Tunjangan
 from .pinjaman_models import Pinjaman
 from .periode_models import PeriodeGaji
+from .karyawan_models import Karyawan
 
 
 
@@ -18,9 +18,8 @@ class LaporanGaji(models.Model) :
     # relsi ke tabel pinjaman
     pinjaman = models.ForeignKey(Pinjaman, on_delete=models.CASCADE, related_name='laporanpenggajian', null=True, blank=True)
 
-
-    # relasi ke tabel user
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='laporanpenggajian', null=True, blank=True)
+    # relasi ke tabel karyawan
+    karyawan = models.ForeignKey(Karyawan, on_delete=models.CASCADE, related_name='laporanpenggajian', null=True, blank=True)
 
     # relasi ke tabel tunjangan
     tunjangan = models.ForeignKey(Tunjangan, on_delete=models.CASCADE, related_name='laporanpenggajian', null=True, blank=True)

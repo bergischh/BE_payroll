@@ -4,22 +4,19 @@ import os
 from django.utils import timezone
 
 def user_directory_path(instance, filename):
-    # Menghasilkan path untuk foto karyawan dengan format timestamp
-    timestamp = timezone.now().strftime('%Y%m%d_%H%M%S')  # Format: YYYYMMDD_HHMMSS
-    ext = filename.split('.')[-1]  # Ambil ekstensi file
-    new_filename = f"{timestamp}.{ext}"  # Gabungkan nama baru dengan ekstensi
+    timestamp = timezone.now().strftime('%Y%m%d_%H%M%S') 
+    ext = filename.split('.')[-1]  
+    new_filename = f"{timestamp}.{ext}"  
     return os.path.join('images_profile/', new_filename)
 
 def ktp_upload_path(instance, filename):
-    # Menghasilkan path untuk KTP dengan nama calon karyawan
-    ext = filename.split('.')[-1]  # Ambil ekstensi file
-    new_filename = f"{instance.nama_karyawan.replace(' ', '_')}_KTP.{ext}"  # Nama file dengan nama calon karyawan
+    ext = filename.split('.')[-1]  
+    new_filename = f"{instance.nama_karyawan.replace(' ', '_')}_KTP.{ext}" 
     return os.path.join('ktp_files/', new_filename)
 
 def ijazah_upload_path(instance, filename):
-    # Menghasilkan path untuk ijazah dengan nama calon karyawan
-    ext = filename.split('.')[-1]  # Ambil ekstensi file
-    new_filename = f"{instance.nama_karyawan.replace(' ', '_')}_IJAZAH.{ext}"  # Nama file dengan nama calon karyawan
+    ext = filename.split('.')[-1]  
+    new_filename = f"{instance.nama_karyawan.replace(' ', '_')}_IJAZAH.{ext}" 
     return os.path.join('ijazah_files/', new_filename)
 
 class CalonKaryawan(models.Model):
@@ -62,26 +59,24 @@ class CalonKaryawan(models.Model):
     ktp = models.FileField(upload_to=ktp_upload_path, null=True, blank=True)
     ijazah = models.FileField(upload_to=ijazah_upload_path, null=True, blank=True)
     status_wawancara = models.CharField(max_length=20, choices=StatusWawancara.choices, default=None)
-    upload_at = models.DateTimeField(auto_now_add=True)  # Menggunakan auto_now_add untuk otomatis mengisi tanggal upload
+    upload_at = models.DateTimeField(auto_now_add=True)  
 
     def save(self, *args, **kwargs):
-        # Hapus foto lama jika ada sebelum menyimpan gambar baru
-        if self.pk:  # Memeriksa apakah objek sudah ada (update)
-            old_instance = CalonKaryawan.objects.get(pk=self.pk)  # Ambil objek lama
+        if self.pk: 
+            old_instance = CalonKaryawan.objects.get(pk=self.pk)
             if old_instance.photo and old_instance.photo != self.photo:
                 if os.path.isfile(old_instance.photo.path):
-                    os.remove(old_instance.photo.path)  # Hapus file lama
+                    os.remove(old_instance.photo.path) 
             if old_instance.ktp and old_instance.ktp != self.ktp:
                 if os.path.isfile(old_instance.ktp.path):
-                    os.remove(old_instance.ktp.path)  # Hapus file KTP lama
+                    os.remove(old_instance.ktp.path)  
             if old_instance.ijazah and old_instance.ijazah != self.ijazah:
                 if os.path.isfile(old_instance.ijazah.path):
-                    os.remove(old_instance.ijazah.path)  # Hapus file ijazah lama
+                    os.remove(old_instance.ijazah.path) 
 
-        super().save(*args, **kwargs)  # Panggil method save superclass
+        super().save(*args, **kwargs) 
 
     def delete(self, *args, **kwargs):
-        # Hapus foto dan file dari penyimpanan lokal jika ada
         if self.photo:
             if os.path.isfile(self.photo.path):
                 os.remove(self.photo.path)
@@ -91,7 +86,6 @@ class CalonKaryawan(models.Model):
         if self.ijazah:
             if os.path.isfile(self.ijazah.path):
                 os.remove(self.ijazah.path)
-        super().delete(*args, **kwargs)  # Panggil method delete superclass
-
+        super().delete(*args, **kwargs)  
     def __str__(self):
         return self.nama_karyawan
