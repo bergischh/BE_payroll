@@ -1,6 +1,6 @@
-// import Login from './components/Login.jsx'
-import Company from './components/company/Company.jsx'
-// import Regis from './components/Regis.jsx'
+// import Company from './components/company/Company.jsx'
+// import Sidebar from './components/admin/Sidebar.jsx'
+import Dashboard from './components/admin/dashboard/Dashboard'
 import './App.css'
 import './index.css'
 
@@ -8,9 +8,9 @@ function App() {
 
   return (
     <>
-      {/* <Login/> */}
-      {/* <Regis/> */}
-      <Company/>
+      {/* <Company/> */}
+      {/* <Sidebar></Sidebar> */}
+      <Dashboard />
     </>
   )
 }

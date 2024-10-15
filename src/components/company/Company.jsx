@@ -1,7 +1,9 @@
 import Index from '../company/home/Index.jsx';
 import LdanP from '../company/content/LdanP.jsx';
-import Bkaryawan from './content/Bkaryawan.jsx';
 import ProdukT from './content/ProdukT.jsx';
+import Bkaryawan from './content/Bkaryawan.jsx';
+import Rekruitmen from './content/Rekruitmen.jsx';
+import Bkontak from './content/Bkontak.jsx';
 import { Icon } from '@iconify/react';
 
 const Company = () => {
@@ -16,6 +18,8 @@ const Company = () => {
             <LdanP></LdanP>
             <ProdukT></ProdukT>
             <Bkaryawan></Bkaryawan>
+            <Rekruitmen></Rekruitmen>
+            <Bkontak></Bkontak>
         </>
     );
 };

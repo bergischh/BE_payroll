@@ -1,7 +1,7 @@
 const Pendiri = () => {
     return (
         <>
-            <div className="flex m-16 w-5/6">
+            <div className="flex m-16 w-5/6" id="pendiri">
                 <div className="left w-3/6">
                     <h1 className='judul text-5xl pt-6 mb-10 font-semibold'><span className="text-transparent bg-clip-text bg-gradient-to-r from-[#7E679F] to-[#97698C]">Pendiri </span><br/> Ola Stationery</h1>
                     <div className="border-b border-black w-4/5 mb-10"></div>

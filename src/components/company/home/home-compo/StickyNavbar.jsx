@@ -6,6 +6,7 @@ import {
     IconButton,
 } from "@material-tailwind/react";
 import { Icon } from '@iconify/react';
+import { Link } from "react-router-dom";
 
 export function StickyNavbar() {
     const [openNav, setOpenNav] = React.useState(false);
@@ -20,27 +21,39 @@ export function StickyNavbar() {
     const navList = (
         <ul className="mt-2 mb-4 flex flex-col gap-2 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center lg:gap-6">
             <li className="relative group">
-                <Icon icon="mdi:home" className="h-8 w-8 text-white"/>
+                <a href="#home-index">
+                    <Icon icon="mdi:home" className="h-8 w-8 text-white"/>
+                </a>
                 <span className="absolute bottom-[-6px] left-0 w-full h-0.5 bg-white transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
             </li>
             <li className="relative group">
-                <Icon icon="bxs-file" className="h-7 w-7 text-white"/>
+                <a href="#pendiri">
+                    <Icon icon="iconamoon:profile-fill" className="h-8 w-8 text-white"/>
+                </a>
                 <span className="absolute bottom-[-6px] left-0 w-full h-0.5 bg-white transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
             </li>
             <li className="relative group">
-                <Icon icon="iconamoon:profile-fill" className="h-8 w-8 text-white"/>
+                <a href="#latar">
+                    <Icon icon="bxs-file" className="h-7 w-7 text-white"/>
+                </a>
                 <span className="absolute bottom-[-6px] left-0 w-full h-0.5 bg-white transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
             </li>
             <li className="relative group">
-                <Icon icon="clarity:group-solid" className="h-9 w-9 text-white"/>
-                <span className="absolute bottom-[-6px] left-0 w-full h-0.5 bg-white transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
-            </li>
-            <li className="relative group">
-                <Icon icon="fa-solid:pencil-ruler" className="h-6 w-6 text-white"/>
+                <a href="#produk">
+                    <Icon icon="fa-solid:pencil-ruler" className="h-6 w-6 text-white"/>
+                </a>
                 <span className="absolute bottom-[-11px] left-0 w-full h-0.5 bg-white transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
             </li>
             <li className="relative group">
-                <Icon icon="material-symbols:format-image-left" className="h-8 w-8 text-white"/>
+                <a href="#karyawan">
+                    <Icon icon="clarity:group-solid" className="h-9 w-9 text-white"/>
+                </a>
+                <span className="absolute bottom-[-6px] left-0 w-full h-0.5 bg-white transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
+            </li>
+            <li className="relative group">
+                <a href="#rekrut">
+                    <Icon icon="material-symbols:format-image-left" className="h-8 w-8 text-white"/>
+                </a>
                 <span className="absolute bottom-[-6px] left-0 w-full h-0.5 bg-white transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
             </li>
         </ul>
@@ -97,17 +110,17 @@ export function StickyNavbar() {
                     {navList}
                     <div className="flex items-center gap-x-1">
                         <Button fullWidth variant="text" size="sm" className="rounded-full">
-                            <span>Sign In</span>
+                            <Link to="/Login">Sign In</Link>
                         </Button>
                         <Button fullWidth variant="gradient" size="sm" className="rounded-full">
-                            <span>Sign Up</span>
+                            <Link to="/Regis">Sign Up</Link>
                         </Button>
                     </div>
                 </Collapse>
             </Navbar>
             <div className="flex gap-4 ml-4 mr-5">
-                <Button type="submit" className="text-white bg-white bg-opacity-25 btn-lg py-2 px-5 rounded-full border-white border">Sign In</Button>
-                <Button type="submit" className="text-white bg-white bg-opacity-25 btn-lg px-5 py-2 rounded-full border-white border">Sign Up</Button>
+                <Link to="/Login" className="text-white bg-white bg-opacity-25 btn-lg py-2 px-5 rounded-full border-white border">Sign In</Link>
+                <Link to="/Regis" className="text-white bg-white bg-opacity-25 btn-lg px-5 py-2 rounded-full border-white border">Sign Up</Link>
             </div>
         </div>
     );

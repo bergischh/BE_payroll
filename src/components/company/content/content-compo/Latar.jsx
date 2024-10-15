@@ -1,7 +1,7 @@
 const Latar = () => {
     return (
         <>
-            <div className="flex m-16 mt-28">
+            <div className="flex m-16 mt-28" id="latar">
                 <div className="left w-[220%]">
                     <img src="./img/latar2.png" alt=""/>
                 </div>
