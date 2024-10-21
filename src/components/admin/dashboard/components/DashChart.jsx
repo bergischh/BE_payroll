@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import { Component } from "react";
 import Chart from "react-apexcharts";
 
 class DashChart extends Component {
@@ -34,7 +34,7 @@ class DashChart extends Component {
           size: 0
         },
         title: {
-          text: "Stock Price Movement",
+          text: "Persentase kehadiran",
           align: "left"
         },
         fill: {
@@ -103,7 +103,7 @@ class DashChart extends Component {
 
   render() {
     return (
-      <div id="chart">
+      <div id="chart" className="bg-[#EDEDED] rounded-xl pt-2">
         <Chart
           options={this.state.options}
           series={this.state.series}

@@ -3,7 +3,7 @@ import { useState, Suspense, lazy } from 'react';
 
 const Sidebar = () => {
     const [open, setOpen] = useState(true);
-    const [activePage, setActivePage] = useState("Dashboard"); // State untuk halaman aktif
+    const [activePage, setActivePage] = useState("Dashboard");
 
     const menus = [
         { title: "Dashboard", icon: "ion:home", component: lazy(() => import('../admin/dashboard/Dashboard.jsx')) },
@@ -32,7 +32,7 @@ const Sidebar = () => {
                         <li
                             key={index}
                             className={`text-white text-sm flex items-center gap-x-4 cursor-pointer py-2 active:hover:bg-[#87789E] rounded-md px-3 mr-5 border-white hover:border hover:border-white relative ${activePage === menu.title ? 'bg-[#87789E] border border-white' : ''}`}
-                            onClick={() => setActivePage(menu.title)} // Update halaman aktif saat diklik
+                            onClick={() => setActivePage(menu.title)}
                         >
                             <Icon icon={menu.icon} className='text-2xl' />
                             <span className={`${!open && "hidden"} origin-left duration-200`}>{menu.title}</span>
@@ -42,9 +42,8 @@ const Sidebar = () => {
             </div>
             <div className="py-5 pr-5 text-2xl font-semibold flex-1 bg-[#A996C5] ">
                 <div className="bg-white rounded-2xl content p-5 overflow-y-hidden" style={{ height: "calc(100vh - 40px)" }}>
-                    {/* Suspense digunakan untuk menampilkan fallback saat halaman sedang dimuat */}
                     <Suspense fallback={<div>Loading...</div>}>
-                        {activeMenu && <activeMenu.component />} {/* Render komponen halaman aktif */}
+                        {activeMenu && <activeMenu.component open={open} />} {/* Passing open as a prop */}
                     </Suspense>
                 </div>
             </div>
@@ -53,3 +52,4 @@ const Sidebar = () => {
 }
 
 export default Sidebar;
+
