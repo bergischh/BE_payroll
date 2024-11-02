@@ -58,7 +58,7 @@ class CalonKaryawan(models.Model):
     photo = models.ImageField(upload_to=user_directory_path, null=True, blank=True)
     ktp = models.FileField(upload_to=ktp_upload_path, null=True, blank=True)
     ijazah = models.FileField(upload_to=ijazah_upload_path, null=True, blank=True)
-    status_wawancara = models.CharField(max_length=20, choices=StatusWawancara.choices, default=None)
+    status_wawancara = models.CharField(max_length=20, choices=StatusWawancara.choices, default=None, null=True, blank=True)
     upload_at = models.DateTimeField(auto_now_add=True)  
 
     def save(self, *args, **kwargs):

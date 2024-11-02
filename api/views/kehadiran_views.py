@@ -38,7 +38,6 @@ class KehadiranView(APIView):
         if not user:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
-        # Pengecekan role pengguna
         if user.role in ['admin', 'manager']:
             presence = Kehadiran.objects.all()
         elif user.role == 'karyawan':
@@ -59,54 +58,56 @@ class KehadiranCreate(APIView):
         token = None
 
         if auth_header and auth_header.startswith('Bearer '):
-            token = auth_header.split(' ')[1]  
+            token = auth_header.split(' ')[1]
         else:
-            token = request.COOKIES.get('accessToken')  
+            token = request.COOKIES.get('accessToken')
 
         if not token:
-             return Response({
-                "error": "Token tidak ada, tolong masukkan token"
-            })
-        
+            return Response({"error": "Token tidak ada, tolong masukkan token"}, status=status.HTTP_401_UNAUTHORIZED)
+
         try:
             user_id = decode_access_token(token)
-        except exceptions.AuthenticationFailed as e:
-            return Response({
-                "error": "Anda tidak memiliki akses."
-            }, status=status.HTTP_401_UNAUTHORIZED)
+        except exceptions.AuthenticationFailed:
+            return Response({"error": "Anda tidak memiliki akses."}, status=status.HTTP_401_UNAUTHORIZED)
 
         user = get_object_or_404(User, id=user_id)
-        if not user:
-            return Response({'error': 'User not found'}, status=404)
-
-        if user.role in ['admin', 'manager']:
-            karyawan_id = request.data.get('karyawan_id')
-            if not karyawan_id:
-                return Response({'error': 'Karyawan ID is required for admins and managers'}, status=400)
-
-            karyawan = Karyawan.objects.filter(id=karyawan_id).first()
-            if not karyawan:
-                return Response({'error': 'Karyawan not found'}, status=404)
         
-        elif user.role == 'karyawan':
-            karyawan = Karyawan.objects.filter(user=user).first()
-            if not karyawan:
-                return Response({'error': 'Karyawan data not found for this user'}, status=404)
-        else:
+        if user.role != 'karyawan':
             return Response({'error': 'Unauthorized role'}, status=403)
 
-        # Validasi dan simpan data kehadiran
+        karyawan = Karyawan.objects.filter(user=user).first()
+        if not karyawan:
+            return Response({'error': 'Karyawan data not found for this user'}, status=404)
+
+        keterangan_kehadiran = request.data.get("keterangan_kehadiran")
+
+        if keterangan_kehadiran == Kehadiran.Keterangan.masuk:
+            required_fields = ['jam_masuk', 'jam_pulang', 'informasi_kehadiran']
+        elif keterangan_kehadiran == Kehadiran.Keterangan.sakit:
+            required_fields = ['biaya_pengobatan', 'keterangan_sakit']
+        elif keterangan_kehadiran == Kehadiran.Keterangan.izin:
+            required_fields = ['keterangan_izin']
+        else:
+            required_fields = []
+
+        for field in required_fields:
+            if not request.data.get(field):
+                return Response({f'error': f'{field} is required for {keterangan_kehadiran} status'}, status=400)
+        
+        total_jam_lembur = request.data.get("total_jam_lembur")
+        
         serializer = KehadiranSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(karyawan=karyawan)
+            kehadiran = serializer.save(karyawan=karyawan)
+            kehadiran.is_read = False
+            kehadiran.save()
+
             return Response({
                 "message": "Berhasil menambah data",
                 "data": serializer.data
             }, status=status.HTTP_201_CREATED)
 
-        return Response({
-            "errors": serializer.errors
-        }, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class KehadiranUpdate(APIView):
@@ -115,28 +116,23 @@ class KehadiranUpdate(APIView):
         token = None
 
         if auth_header and auth_header.startswith('Bearer '):
-            token = auth_header.split(' ')[1]  
+            token = auth_header.split(' ')[1]
         else:
-            token = request.COOKIES.get('accessToken')  
+            token = request.COOKIES.get('accessToken')
 
         if not token:
-             return Response({
-                "error": "Token tidak ada, tolong masukkan token"
-            })
-        
+            return Response({"error": "Token tidak ada, tolong masukkan token"}, status=status.HTTP_401_UNAUTHORIZED)
+
         try:
             user_id = decode_access_token(token)
-        except exceptions.AuthenticationFailed as e:
-            return Response({
-                "error": "Anda tidak memiliki akses."
-            }, status=status.HTTP_401_UNAUTHORIZED)
+        except exceptions.AuthenticationFailed:
+            return Response({"error": "Anda tidak memiliki akses."}, status=status.HTTP_401_UNAUTHORIZED)
 
         user = get_object_or_404(User, id=user_id)
 
         if user is None:
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        # Dapatkan id kehadiran dari URL kwargs
         kehadiran_id = kwargs.get('id')
         presence = get_object_or_404(Kehadiran, id=kehadiran_id)
 
@@ -164,7 +160,7 @@ class KehadiranUpdate(APIView):
 
      
 class KehadiranDelete(APIView):
-     def put(self, request, *args, **kwargs):
+     def delete(self, request, *args, **kwargs):
         auth_header = request.headers.get('Authorization')
         token = None
 
@@ -190,23 +186,40 @@ class KehadiranDelete(APIView):
         if user is None:
             return Response({"error": "User tidak ditemukan"}, status=status.HTTP_404_NOT_FOUND)
 
-        laporan_id = kwargs.get('id')
-        report = get_object_or_404(LaporanGaji, id=laporan_id)
+        id = kwargs.get('id')
+        kehadiran = get_object_or_404(Kehadiran, id=id)
 
         if user.role in ['admin', 'manager']:
             pass
         else:
             return Response({"error": "Invalid user role"}, status=status.HTTP_403_FORBIDDEN)
-        # autentikasi user mengunakan token END
 
-        serializer = LaporanSerializer(report, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({
-                "message" : "Berhasil update data",
-                "data" : serializer.data
-            }, status=status.HTTP_200_OK)
+        kehadiran.delete()
         return Response({
-            "errors" : serializer.errors
-        }, status=status.HTTP_400_BAD_REQUEST)
+            "message" : "Berhasil menghapus data"
+        }, status=status.HTTP_204_NO_CONTENT)
+     
+
+class KehadiranApproval(APIView):
+    def post(self, request, *args, **kwargs):
+        id = kwargs.get('id')
+        action = request.data.get('action')  
+
+        kehadiran = get_object_or_404(Kehadiran, id=id)
+
+        if action == 'approve':
+            kehadiran.is_approved = True
+        elif action == 'reject':
+            kehadiran.is_approved = False
+        else:
+            return Response({"error": "Invalid action"}, status=status.HTTP_400_BAD_REQUEST)
+
+        kehadiran.is_read = True
+        kehadiran.save()
+
+        return Response({
+            "message": f"Kehadiran {action}ed successfully",
+            "is_approved": kehadiran.is_approved
+        }, status=status.HTTP_200_OK)
+
    

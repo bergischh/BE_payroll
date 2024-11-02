@@ -1,22 +1,18 @@
 from django.db import models
 from django.core.validators import MinLengthValidator, MaxLengthValidator, RegexValidator
 from django.utils import timezone
-import os
-
 from .user_models import User
 from .departement_models import Departement
+import os
 
 
 def user_directory_path(instance, filename):
-    # Menghasilkan nama file baru dengan menambahkan timestamp
-    timestamp = timezone.now().strftime('%Y%m%d_%H%M%S')  # Format: YYYYMMDD_HHMMSS
-    ext = filename.split('.')[-1]  # Ambil ekstensi file
-    new_filename = f"{timestamp}.{ext}"  # Gabungkan nama baru dengan ekstensi
+    timestamp = timezone.now().strftime('%Y%m%d_%H%M%S')  
+    ext = filename.split('.')[-1]  
+    new_filename = f"{timestamp}.{ext}"  
     return os.path.join('foto_karyawan/', new_filename)
 
-
 class Karyawan(models.Model):  
-
     class JenisKelamin(models.TextChoices) :
         laki_laki = 'laki_laki', 'Laki Laki'
         perempuan = 'perempuan', 'Perempuan'   
@@ -47,34 +43,27 @@ class Karyawan(models.Model):
             ),
         ],
     ) 
-    # email = models.CharField(max_length=100)
-    jabatan = models.CharField(max_length=100)
+    jabatan = models.CharField(max_length=100, null=True, blank=True)
     foto = models.ImageField(upload_to=user_directory_path, null=True, blank=True)
     
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='karyawan_profiles')
 
-    # Relasi ke tabel User
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='karyawan_profiles')
-
-    # Relasi ke tabel Departement
-    department = models.ForeignKey(Departement, on_delete=models.CASCADE, related_name='karyawan_profiles')
+    department = models.ForeignKey(Departement, on_delete=models.CASCADE, related_name='karyawan_profiles', null=True, blank=True)
 
     def save(self, *args, **kwargs):
-        # Hapus file gambar lama jika ada sebelum menyimpan gambar baru
-        if self.pk:  # Memeriksa apakah objek sudah ada (update)
-            old_instance = Karyawan.objects.get(pk=self.pk)  # Ambil objek lama
+        if self.pk:  
+            old_instance = Karyawan.objects.get(pk=self.pk)  
             if old_instance.foto and old_instance.foto != self.foto:
                 if os.path.isfile(old_instance.foto.path):
-                    os.remove(old_instance.foto.path)  # Hapus file lama
+                    os.remove(old_instance.foto.path)  
 
-        super().save(*args, **kwargs)  # Panggil method save superclass
+        super().save(*args, **kwargs) 
 
     def delete(self, *args, **kwargs):
-        # Hapus file gambar dari penyimpanan lokal jika ada
         if self.foto:
             if os.path.isfile(self.foto.path):
                 os.remove(self.foto.path)
-        super().delete(*args, **kwargs)  # Panggil method delete superclass
-
+        super().delete(*args, **kwargs)  
 
     def __str__(self):
         return self.nama_karyawan

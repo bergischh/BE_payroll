@@ -109,8 +109,8 @@ class KaryawanUpdate(APIView):
         if not token:
             return Response({
                 "error": "Token tidak ada, tolong masukkan token"
-            })
-        
+            }, status=status.HTTP_401_UNAUTHORIZED)
+          
         try:
             user_id = decode_access_token(token)
         except exceptions.AuthenticationFailed:
@@ -118,18 +118,17 @@ class KaryawanUpdate(APIView):
                 "error": "Anda tidak memiliki akses."
             }, status=status.HTTP_401_UNAUTHORIZED)
        
-        user = User.objects.filter(id=user_id).first()
+        user = get_object_or_404(User, id=user_id) 
         
-        Karyawan_id = kwargs.get('id')
-        employees = get_object_or_404(Karyawan, id=Karyawan_id)
+        karyawan_id = kwargs.get('id')
+        karyawan = get_object_or_404(Karyawan, id=karyawan_id)
 
-        if user.role not in ['admin', 'manager'] :
-           return Response({
-                "error": "Invalid user role"
+        if user.role != 'admin' and karyawan.user_id != user.id:
+            return Response({
+                "error": "Anda tidak memiliki izin untuk mengedit data ini."
             }, status=status.HTTP_403_FORBIDDEN)
-
         
-        serializer = KaryawanSerializer(employees, data=request.data, partial=True)
+        serializer = KaryawanSerializer(karyawan, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response({
@@ -139,6 +138,7 @@ class KaryawanUpdate(APIView):
         return Response({
             "errors" : serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
+
     
 class KaryawanDelete(APIView):
     def put(self, request, *args, **kwargs):

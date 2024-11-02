@@ -5,7 +5,7 @@ from rest_framework.authentication import get_authorization_header
 from django.conf import settings
 from rest_framework import status
 from rest_framework import exceptions
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from ..serializers import UsersSerializer
 from ..models import User
 from ..authentication import create_access_token, create_refresh_token, decode_access_token, decode_refresh_token
@@ -23,25 +23,69 @@ class UserAPIView(APIView):
             return Response(UsersSerializer(user).data)
 
         raise AuthenticationFailed('unauthenticated')
+    
 
 class RegisterView(APIView):
     def post(self, request):
         serializer = UsersSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
-    
+
+        if serializer.is_valid():
+            username = request.data.get('username')
+            email = request.data.get('email')
+            password = request.data.get('password')
+            role = request.data.get('role')  
+            confirm_password = request.POST.get('confirm_password')
+
+            if password != confirm_password:
+                return Response({
+                    'error': 'Passwords do not match'
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            if User.objects.filter(username=username).exists():
+                return Response({
+                    'error': 'Username already exists'
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            if User.objects.filter(email=email).exists():
+                return Response({
+                    'error': 'Email already exists'
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            if not role:
+                return Response({
+                    'error': 'Role is required'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            role = User.Role.CALON_KARYAWAN
+            user = User.objects.create_user(username=username, role=role, email=email, password=password)
+            user.save()
+
+            user_serializer = UsersSerializer(user)
+
+            return Response({
+                "message": "Berhasil membuat akun",
+                "data": user_serializer.data  
+            }, status=status.HTTP_201_CREATED)
+
+        return Response({
+            "errors": serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+
 class UpdateUserView(APIView):
     def put(self, request, *args, **kwargs):
-        # Autentikasi token
-        auth = get_authorization_header(request).split()
+        auth_header = request.headers.get('Authorization')
+        token = None
 
-        if auth and len(auth) == 2 and auth[0].lower() == b'bearer':
-            token = auth[1].decode('utf-8')
+        if auth_header and auth_header.startswith('Bearer '):
+            token = auth_header.split(' ')[1]  
         else:
+            token = request.COOKIES.get('accessToken')  
+
+        if not token:
             return Response({
-                'error': 'Token tidak ada, tolong masukkan token untuk mengakses.'
-                }, status=status.HTTP_401_UNAUTHORIZED)
+                "error": "Token tidak ada, tolong masukkan token"
+            })
         
         try:
             user_id = decode_access_token(token)
@@ -49,16 +93,14 @@ class UpdateUserView(APIView):
             return Response({
                 "error": "Anda tidak memiliki akses."
             }, status=status.HTTP_401_UNAUTHORIZED)
-
-        # Mendapatkan user berdasarkan token
+    
         user = get_object_or_404(User, id=user_id)
 
-        # Memastikan user yang ingin diperbarui adalah yang sedang login
-        if user.id != kwargs['id']:  # Asumsi primary key dikirim sebagai argumen URL (e.g. /users/<id>/)
+        if user.id != kwargs['id']: 
             return Response({'error': 'You can only update your own account.'}, status=403)
 
         # Memproses data update
-        serializer = UsersSerializer(user, data=request.data, partial=True)  # `partial=True` memungkinkan update parsial
+        serializer = UsersSerializer(user, data=request.data, partial=True)  
         if serializer.is_valid():
             serializer.save()
             return Response({
@@ -70,32 +112,34 @@ class UpdateUserView(APIView):
         }, status=400)
 
     
-class LoginView(APIView):
+class LoginView(APIView): 
      def post(self, request):
-        user = User.objects.filter(email=request.data['email']).first()
+        email = request.data.get('email')
+        password = request.data.get('password')
+
+        user = User.objects.filter(email=email).first()
 
         if not user:
             raise APIException('Invalid credentials!')
 
-        if not user.check_password(request.data['password']):
+        if not user.check_password(password):
             raise APIException('Invalid credentials!')
 
         access_token = create_access_token(user.id)
         refresh_token = create_refresh_token(user.id)
 
-        response = Response()
-
-        response.set_cookie(key='refreshToken', value=refresh_token, httponly=True)
-        response.data = {
+        response = Response({
             'message': 'Anda berhasil login',
             'token': access_token
-        }
+        })
+
+        response.set_cookie(key='accessToken', value=access_token, httponly=True)
 
         return response
     
 class RefreshAPIView(APIView):
     def post(self, request):
-        refresh_token = request.COOKIES.get('refreshToken')
+        refresh_token = request.COOKIES.get('accessToken')
         id = decode_refresh_token(refresh_token)
         access_token = create_access_token(id)
         return Response({
@@ -105,7 +149,7 @@ class RefreshAPIView(APIView):
 class LogoutView(APIView):
      def post(self, _):
         response = Response()
-        response.delete_cookie(key="refreshToken")
+        response.delete_cookie(key="accessToken")
         response.data = {
             'message': 'success'
         }

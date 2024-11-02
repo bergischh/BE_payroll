@@ -4,10 +4,10 @@ from django.urls import path
 from .views.user_views import RegisterView, LoginView, UserAPIView, RefreshAPIView, LogoutView, UpdateUserView
 from .views.karyawan_views import KaryawanViews, KaryawanCreate, KaryawanUpdate, KaryawanDelete
 from .views.departement_views import DepartementView, DepartementCreate, DepartmentUpdate, DepartmentDelete
-from .views.calonkaryawan_views import CalonKaryawanView, CalonKaryawanCreate, CalonKaryawanUpdate, CalonKaryawanDelete
+from .views.calonkaryawan_views import CalonKaryawanView, CalonKaryawanCreate, CalonKaryawanUpdate, CalonKaryawanDelete, CalonKaryawanAccept, CalonKaryawanReject
 from .views.tunjangan_views import TunjanganView, TunjanganCreate, TunjanganUpdate, TunjanganDelete
 from .views.pinjaman_views import PinjamanView, PinjamanCreate, PinjamanUpdate, PinjamanDelete
-from .views.kehadiran_views import KehadiranView, KehadiranCreate, KehadiranUpdate, KehadiranDelete
+from .views.kehadiran_views import KehadiranView, KehadiranCreate, KehadiranUpdate, KehadiranDelete, KehadiranApproval
 from .views.periode_views import PeriodeView, PeriodeCreate, PeriodeUpdate, PeriodeDelete
 from .views.laporangaji_views import LaporanGajiView, LaporanGajiCreate, LaporanGajiUpdate, LaporanGajiDelete
 from .views.slipgaji_views import SlipGajiView, SlipGajiCreate, SlipGajiUpdate, SlipGajiDelete
@@ -40,6 +40,8 @@ urlpatterns = [
     path('create-calon-karyawan/', CalonKaryawanCreate.as_view(), name='calon-karyawan-create'), 
     path('update-calon-karyawan/<int:id>/', CalonKaryawanUpdate.as_view(), name='calon-karyawan-update'),
     path('delete-calon-karyawan/<int:id>/', CalonKaryawanDelete.as_view(), name='calon-karyawan-delete'), 
+    path('calon-karyawan/accept/', CalonKaryawanAccept.as_view(), name='calon-karyawan-accept'), 
+    path('calon-karyawan/reject/', CalonKaryawanReject.as_view(), name='calon-karyawan-reject'), 
  
     # tunjangan karyawan
     path('tunjangan/', TunjanganView.as_view(), name='tunjangan'),
@@ -58,6 +60,7 @@ urlpatterns = [
     path('create-kehadiran/', KehadiranCreate.as_view(), name='kehadiran-create'), 
     path('update-kehadiran/<int:id>/', KehadiranUpdate.as_view(), name='kehadiran-update'),
     path('delete-kehadiran/<int:id>/', KehadiranDelete.as_view(), name='kehadiran-delete'), 
+    path('approve-kehadiran/<int:id>/', KehadiranApproval.as_view(), name='kehadiran-approve'), 
 
     # periode karyawan
     path('periode/', PeriodeView.as_view(), name='periode'),

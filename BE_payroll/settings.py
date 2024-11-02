@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-fd$*e4%q5-=bo72nk448)ue_ns5)hl2e6#5bi5zvjmi_pb7w1t
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -153,3 +153,12 @@ CORS_ALLOW_CREDENTIALS = True
 
 # STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_ROOT = BASE_DIR / 'media' # file yang di upload otomatis tersimpan di lokal
+
+
+# email confirmation EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_FROM = 'bergischhumaira23@gmail.com'
+# EMAIL_HOST_USER = 'bergischhumaira23@gmail.com'
+# EMAIL_HOST_PASSWORD = 'bzjduqnslofwnru'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
