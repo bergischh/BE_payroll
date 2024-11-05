@@ -5,10 +5,9 @@ from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.authentication import get_authorization_header
 from django.shortcuts import get_object_or_404
+from datetime import date
 
-from ..models.laporangaji_models import LaporanGaji
-from ..models.karyawan_models import Karyawan
-from ..models.user_models import User
+from ..models import LaporanGaji, Karyawan, User, Pinjaman, Tunjangan, PeriodeGaji
 from ..serializers import LaporanSerializer
 from ..authentication import decode_access_token
 
@@ -61,40 +60,47 @@ class LaporanGajiCreate(APIView):
             token = request.COOKIES.get('accessToken')  
 
         if not token:
-             return Response({
-                "error": "Token tidak ada, tolong masukkan token"
-            })
-        
+            return Response({"error": "Token tidak ada, tolong masukkan token"})
+
         try:
             user_id = decode_access_token(token)
         except exceptions.AuthenticationFailed as e:
-            return Response({
-                "error": "Anda tidak memiliki akses."
-            }, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"error": "Anda tidak memiliki akses."}, status=status.HTTP_401_UNAUTHORIZED)
 
         user = get_object_or_404(User, id=user_id)
 
         if user.role not in ['admin', 'manager']:
-            return Response({
-                "error": "Invalid user role, You are not an admin or manager"
-            }, status=status.HTTP_403_FORBIDDEN)
+            return Response({"error": "Invalid user role, You are not an admin or manager"}, status=status.HTTP_403_FORBIDDEN)
         
         karyawan_id = request.data.get('karyawan')
         karyawan = get_object_or_404(Karyawan, id=karyawan_id)
+        
+        periode_gaji_id = request.data.get('periodegaji')
+        periode_gaji = get_object_or_404(PeriodeGaji, id=periode_gaji_id) if periode_gaji_id else None
 
-        serializer = LaporanSerializer(data=request.data)
+        tunjangan = Tunjangan.objects.filter(karyawan=karyawan).first()
+        pinjaman = Pinjaman.objects.filter(karyawan=karyawan).first()
+
+        laporan_data = {
+            "tanggal_gaji": date.today(),
+            "gaji_mentah": request.data.get('gaji_mentah'),
+            "gaji_total": request.data.get('gaji_total'),
+            "jumlah_izin": request.data.get('jumlah_izin', 0),
+            "jumlah_sakit": request.data.get('jumlah_sakit', 0),
+            "pinjaman": pinjaman.id if pinjaman else None,
+            "tunjangan": tunjangan.id if tunjangan else None,
+            "periodegaji": periode_gaji.id if periode_gaji else None,
+            "karyawan": karyawan.id,
+        }
+
+        serializer = LaporanSerializer(data=laporan_data)
         if serializer.is_valid():
             serializer.save(karyawan=karyawan)
-            return Response({
-                "message": "Berhasil menambah data",
-                "data": serializer.data
-            }, status=status.HTTP_201_CREATED)
+            return Response({"message": "Berhasil menambah data", "data": serializer.data}, status=status.HTTP_201_CREATED)
         
-        return Response({
-            "errors": serializer.errors
-        }, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-    
+
 class LaporanGajiUpdate(APIView):
     def put(self, request, *args, **kwargs):
         auth_header = request.headers.get('Authorization')

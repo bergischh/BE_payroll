@@ -19,7 +19,7 @@ class Kehadiran(models.Model):
     biaya_pengobatan = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
     keterangan_sakit = models.TextField(null=True, blank=True)
     keterangan_izin = models.TextField(null=True, blank=True)
-    is_approved = models.BooleanField(default=False)  # True jika disetujui, False jika ditolak
-    is_read = models.BooleanField(default=False)      # Menandai apakah notifikasi sudah dibaca
+    is_approved = models.BooleanField(default=False) 
+    is_read = models.BooleanField(default=False)     
 
     karyawan = models.ForeignKey(Karyawan, on_delete=models.CASCADE, related_name='kehadirankaryawan', null=True, blank=True)

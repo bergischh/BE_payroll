@@ -10,6 +10,8 @@ from .models.laporangaji_models import LaporanGaji
 from .models.periode_models import PeriodeGaji
 from .models.slipgaji_models import SlipGaji
 from .models.transaksi_models import Transaction
+from .models.product_models import Product
+from .models.company_models import Company
 
 class UsersSerializer(serializers.ModelSerializer):
     class Meta: 
@@ -69,23 +71,26 @@ class KehadiranSerializer(serializers.ModelSerializer):
         return None
 
 class LaporanSerializer(serializers.ModelSerializer):
-    karyawan = serializers.SerializerMethodField()
+    # karyawan = serializers.SerializerMethodField()
+    karyawan = serializers.PrimaryKeyRelatedField(queryset=Karyawan.objects.all())
+    pinjaman = serializers.PrimaryKeyRelatedField(queryset=Pinjaman.objects.all(), required=False, allow_null=True)
+    tunjangan = serializers.PrimaryKeyRelatedField(queryset=Tunjangan.objects.all(), required=False, allow_null=True)
+    periodegaji = serializers.PrimaryKeyRelatedField(queryset=PeriodeGaji.objects.all(), required=False, allow_null=True)
     
     class Meta:
         model = LaporanGaji
         fields = '__all__'
         read_only_fields = ['karyawan']
 
-    def get_karyawan(self, instance):
-        if instance.karyawan:
-            return {
-                'id': instance.karyawan.id,
-                'nik': instance.karyawan.nik,
-                'nama_karyawan': instance.karyawan.nama_karyawan,
-                'jabatan': instance.karyawan.jabatan,
-            }
-        return None
-    
+    # def get_karyawan(self, instance):
+    #     if instance.karyawan:
+    #         return {
+    #             'id': instance.karyawan.id,
+    #             'nik': instance.karyawan.nik,
+    #             'nama_karyawan': instance.karyawan.nama_karyawan,
+    #             'jabatan': instance.karyawan.jabatan,
+    #         }
+    #     return None
     
 
 class PeriodeSerializer(serializers.ModelSerializer):
@@ -101,4 +106,14 @@ class SlipGajiSerializer(serializers.ModelSerializer):
 class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
+        fields = '__all__'
+
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = '__all__'
+
+class CompanySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Company
         fields = '__all__'

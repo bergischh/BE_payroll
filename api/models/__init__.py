@@ -9,3 +9,5 @@ from .laporangaji_models import LaporanGaji
 from .periode_models import PeriodeGaji
 from .slipgaji_models import SlipGaji
 from .transaksi_models import Transaction
+from .company_models import Company
+from .product_models import Product

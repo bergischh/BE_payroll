@@ -6,15 +6,22 @@ from .views.karyawan_views import KaryawanViews, KaryawanCreate, KaryawanUpdate,
 from .views.departement_views import DepartementView, DepartementCreate, DepartmentUpdate, DepartmentDelete
 from .views.calonkaryawan_views import CalonKaryawanView, CalonKaryawanCreate, CalonKaryawanUpdate, CalonKaryawanDelete, CalonKaryawanAccept, CalonKaryawanReject
 from .views.tunjangan_views import TunjanganView, TunjanganCreate, TunjanganUpdate, TunjanganDelete
-from .views.pinjaman_views import PinjamanView, PinjamanCreate, PinjamanUpdate, PinjamanDelete
-from .views.kehadiran_views import KehadiranView, KehadiranCreate, KehadiranUpdate, KehadiranDelete, KehadiranApproval
+from .views.pinjaman_views import PinjamanView, PinjamanCreate, PinjamanUpdate, PinjamanDelete, PeminjamanApproval
+from .views.kehadiran_views import KehadiranView, KehadiranCreate, KehadiranUpdate, KehadiranDelete, KehadiranApproval, KehadiranChartView
 from .views.periode_views import PeriodeView, PeriodeCreate, PeriodeUpdate, PeriodeDelete
 from .views.laporangaji_views import LaporanGajiView, LaporanGajiCreate, LaporanGajiUpdate, LaporanGajiDelete
 from .views.slipgaji_views import SlipGajiView, SlipGajiCreate, SlipGajiUpdate, SlipGajiDelete
 from .views.transaksi_views import TransactionView, TransactionCreate, TransactionUpdate, TransactionDelete
+from .views.company import KaryawanList, ProductCreate, ProductList, ProductUpdate, ProductDelete, RecruitmentView, RecruitmentCreate, RecruitmentUpdate, RecruitmentDelete, ToggleCompanyStatus
+from .views.dashboard import AdminandManagerDashboard, KaryawanDashboard
 
 
 urlpatterns = [
+    # dashboard 
+    path('dashboard/admin/', AdminandManagerDashboard.as_view(), name='admin-dashboard'),  
+    path('dashboard/karyawan/', KaryawanDashboard.as_view(), name='karyawan-dashboard'),  
+
+
     # user
     path('register/', RegisterView.as_view(), name='register-users'),  
     path('login/', LoginView.as_view(), name='login-users'),  
@@ -54,6 +61,7 @@ urlpatterns = [
     path('create-pinjaman/', PinjamanCreate.as_view(), name='pinjaman-create'), 
     path('update-pinjaman/<int:id>/', PinjamanUpdate.as_view(), name='pinjaman-update'),
     path('delete-pinjaman/<int:id>/', PinjamanDelete.as_view(), name='pinjaman-delete'), 
+    path('approve-pinjaman/<int:id>/', PeminjamanApproval.as_view(), name='pinjaman-approve'), 
 
     # kehadiran karyawan
     path('kehadiran/', KehadiranView.as_view(), name='kehadiran'),
@@ -61,6 +69,8 @@ urlpatterns = [
     path('update-kehadiran/<int:id>/', KehadiranUpdate.as_view(), name='kehadiran-update'),
     path('delete-kehadiran/<int:id>/', KehadiranDelete.as_view(), name='kehadiran-delete'), 
     path('approve-kehadiran/<int:id>/', KehadiranApproval.as_view(), name='kehadiran-approve'), 
+    path('kehadiran/chart/', KehadiranChartView.as_view(), name='kehadiran_chart'),
+    path('kehadiran/chart/<int:year>/<int:month>/', KehadiranChartView.as_view(), name='kehadiran_chart_detail'),
 
     # periode karyawan
     path('periode/', PeriodeView.as_view(), name='periode'),
@@ -85,7 +95,22 @@ urlpatterns = [
     path('create-transaction/', TransactionCreate.as_view(), name='transaction-create'), 
     path('update-transaction/<int:id>/', TransactionUpdate.as_view(), name='transaction-update'),
     path('delete-transaction/<int:id>/', TransactionDelete.as_view(), name='transaction-delete'), 
- 
-    
 
+    # recruitment 
+    path('recruitment/', RecruitmentView.as_view(), name='recruitment'),
+    path('create-recruitment/', RecruitmentCreate.as_view(), name='create-recruitment'),
+    path('update-recruitment/<int:id>/', RecruitmentUpdate.as_view(), name='update-recruitment'),
+    path('delete-recruitment/<int:id>/', RecruitmentDelete.as_view(), name='delete-recruitment'),
+
+    # product
+    path('product/', ProductList.as_view(), name='product'),
+    path('create-product/', ProductCreate.as_view(), name='create-product'),
+    path('update-product/<int:id>/', ProductUpdate.as_view(), name='update-product'),
+    path('delete-product/<int:id>/', ProductDelete.as_view(), name='delete-product'),
+
+    # karyawan list
+    path('karyawan-list/', KaryawanList.as_view(), name='karyawan-list'),
+
+    # toggle handle recruitment
+    path('toggle-openrec/<int:id>/', ToggleCompanyStatus.as_view(), name='toggle-status'),
 ]

@@ -173,7 +173,6 @@ class DepartmentDelete(APIView):
             return Response({
                 "error": "Invalid user role"
             }, status=status.HTTP_403_FORBIDDEN)
-        # autentikasi user mengunakan token END
 
         departments.delete()
         return Response({

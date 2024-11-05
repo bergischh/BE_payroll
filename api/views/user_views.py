@@ -96,21 +96,31 @@ class UpdateUserView(APIView):
     
         user = get_object_or_404(User, id=user_id)
 
-        if user.id != kwargs['id']: 
-            return Response({'error': 'You can only update your own account.'}, status=403)
+        # Check if the current user is an admin
+        if not user.is_staff:  # Assuming is_staff indicates admin status
+            return Response({'error': 'You do not have permission to perform this action.'}, status=status.HTTP_403_FORBIDDEN)
+
+        # Fetch the user to be updated
+        user_to_update = get_object_or_404(User, id=kwargs['id'])
+
+        # Remove username and password from request data if they exist
+        if 'username' in request.data:
+            del request.data['username']
+        if 'password' in request.data:
+            del request.data['password']
 
         # Memproses data update
-        serializer = UsersSerializer(user, data=request.data, partial=True)  
+        serializer = UsersSerializer(user_to_update, data=request.data, partial=True)  
         if serializer.is_valid():
             serializer.save()
             return Response({
                 'message': 'User data updated successfully',
                 'data': serializer.data
-            }, status=200)
+            }, status=status.HTTP_200_OK)
+        
         return Response({
             'errors': serializer.errors
-        }, status=400)
-
+        }, status=status.HTTP_400_BAD_REQUEST)
     
 class LoginView(APIView): 
      def post(self, request):

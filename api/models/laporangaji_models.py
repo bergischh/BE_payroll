@@ -15,7 +15,7 @@ class LaporanGaji(models.Model) :
     jumlah_izin = models.IntegerField()
     jumlah_sakit = models.IntegerField()
 
-    # relsi ke tabel pinjaman
+    # relai ke tabel pinjaman
     pinjaman = models.ForeignKey(Pinjaman, on_delete=models.CASCADE, related_name='laporanpenggajian', null=True, blank=True)
 
     # relasi ke tabel karyawan

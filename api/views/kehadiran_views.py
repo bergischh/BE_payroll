@@ -5,6 +5,9 @@ from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.authentication import get_authorization_header
 from django.shortcuts import get_object_or_404
+from django.db.models import Count, Q
+from datetime import datetime
+from calendar import monthrange
 
 from ..models.kehadiran_models import Kehadiran
 from ..models.user_models import User
@@ -39,7 +42,7 @@ class KehadiranView(APIView):
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
         if user.role in ['admin', 'manager']:
-            presence = Kehadiran.objects.all()
+            presence = Kehadiran.objects.select_related('karyawan').filter(is_approved=True)
         elif user.role == 'karyawan':
             karyawan = Karyawan.objects.filter(user=user).first()
             if not karyawan:
@@ -76,6 +79,7 @@ class KehadiranCreate(APIView):
             return Response({'error': 'Unauthorized role'}, status=403)
 
         karyawan = Karyawan.objects.filter(user=user).first()
+        
         if not karyawan:
             return Response({'error': 'Karyawan data not found for this user'}, status=404)
 
@@ -221,5 +225,41 @@ class KehadiranApproval(APIView):
             "message": f"Kehadiran {action}ed successfully",
             "is_approved": kehadiran.is_approved
         }, status=status.HTTP_200_OK)
+    
 
-   
+class KehadiranChartView(APIView):
+    def get(self, request, year=None):
+        if not year:
+            today = datetime.today()
+            year = today.year
+
+        total_karyawan = Karyawan.objects.count()
+
+        monthly_attendance = []
+
+        for month in range(1, 13):
+            kehadiran_masuk = Kehadiran.objects.filter(
+                tanggal__year=year,
+                tanggal__month=month,
+                keterangan_kehadiran=Kehadiran.Keterangan.masuk,  
+                is_approved=True
+            ).values('karyawan').distinct().count()  
+
+            if total_karyawan > 0:
+                persentase_kehadiran = (kehadiran_masuk / total_karyawan) * 100
+            else:
+                persentase_kehadiran = 0
+
+            monthly_attendance.append({
+                "month": month,
+                "employees_present": kehadiran_masuk,
+                "attendance_percentage": f"{persentase_kehadiran:.2f}%"
+            })
+
+        data = {
+            "year": year,
+            "total_employees": total_karyawan,
+            "monthly_attendance": monthly_attendance
+        }
+
+        return Response(data, status=status.HTTP_200_OK)
