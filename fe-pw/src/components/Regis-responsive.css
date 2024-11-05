@@ -1,0 +1,25 @@
+@media screen and (max-width: 431px) {
+    .card, .card-login {
+        /* display: block !important; */
+        flex-direction: column-reverse;
+    }
+    .card-login {
+        max-width: 300px;
+        margin: 0 auto;
+        padding-left: 1.5rem !important;
+    }
+    .left-login {
+        padding-top: 1.5rem !important;
+    }
+    .card-login h1 {
+        font-size: 25px !important;
+        line-height: 1;
+    }
+    .logo {
+        width: 300px;
+        margin-bottom: 1.5rem !important;
+    }
+    .img-vector {
+        width: 50% !important;
+    }
+}
