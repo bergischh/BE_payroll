@@ -20,8 +20,8 @@ const Dashboard = ({ open }) => {
     };
 
     useEffect(() => {
-        // Simulasi loading data selama 2 detik
-        const timer = setTimeout(() => setLoading(false), 1000);
+        // Simulasi loading data selama 0.8 detik
+        const timer = setTimeout(() => setLoading(false), 800);
         return () => clearTimeout(timer);
     }, []);
 

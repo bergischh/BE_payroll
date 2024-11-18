@@ -30,8 +30,8 @@ const CardModal = (props) => {
     }
     return (
         <>
-      <Button onClick={handleOpen} className={`${backg} ${wbtn}`}>
-        <div className="flex">
+      <Button onClick={handleOpen} className={`${backg} ${wbtn}`}> 
+        <div className="flex items-center">
           <Icon icon={iconbtn} className={ukiconbtn}/>
           {namabtn}
         </div>
@@ -40,7 +40,7 @@ const CardModal = (props) => {
         size="sm" 
         open={open} 
         handler={handleOpen} 
-        className="bg-cover bg-center"
+        className="bg-center"
         style={{ backgroundImage: "url('./img/CardModal.png')" }}
         >
         <DialogHeader className="relative m-0 block">

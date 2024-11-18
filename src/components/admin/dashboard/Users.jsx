@@ -18,6 +18,7 @@ import { Icon } from "@iconify/react";
 import SearchTable from "./components/SearchTable";
 import React from "react";
 import CardModal from "./components/CardModal";
+import ButtonPagination from "./components/ButtonPagination";
 
 const Users = () => {
     const [selectedUser, setSelectedUser] = React.useState(null);
@@ -50,18 +51,21 @@ const Users = () => {
         };
     }, [selectedUser]);
 
-    const [users, setUsers] = useState([
+    const [users] = useState([
         { id: 1, username: "user1", role: "admin", email: "user1@example.com" },
         { id: 2, username: "user2", role: "manager", email: "user2@example.com" },
         { id: 3, username: "user3", role: "karyawan", email: "user3@example.com" },
         { id: 4, username: "user4", role: "cal-karyawan", email: "user4@example.com" },
         { id: 5, username: "user5", role: "admin", email: "user5@example.com" },
     ]);
-    const [loading, setLoading] = useState(false);
     const TABLE_HEAD = ["No", "Username", "Role", "Email", "Action"];
-
+    
+    // loading
+    const [loading, setLoading] = useState(true);
     useEffect(() => {
-        setLoading(false);
+        // Simulasi loading data selama 0.8 detik
+        const timer = setTimeout(() => setLoading(false), 800);
+        return () => clearTimeout(timer);
     }, []);
 
     if (loading) {
@@ -106,12 +110,12 @@ const Users = () => {
                             </MenuList>
                         </Menu>
                     </div>
-                    <CardModal
+                    <CardModal 
                         toptitle="Tambah akun User"
                         icon={<Icon icon="mdi:account" />}
                         namabtn="Tambah User"
                         iconbtn="iconamoon:folder-add-light"
-                        ukiconbtn="h-6 w-6 color-white"
+                        ukiconbtn="h-6 w-6 color-white mr-1"
                         backg="bg-[#7E679F]"
                         wbtn="flex items-center gap-3 p-2"
                         button={<Button color="blue" className="p-3">Reset</Button>}
@@ -175,7 +179,6 @@ const Users = () => {
                                                         backg="bg-[#FFC107]"
                                                         wbtn="p-2"
                                                         onClick={handleClose}
-                                                        button={<Button color="amber" className="p-0">Edit</Button>}
                                                     />
                                                     <Button color="red" size="sm" onClick={handleClose} fullWidth className="flex px-2">
                                                         <Icon icon="material-symbols:delete-outline" className="h-4 w-4 mr-2" />
@@ -199,19 +202,7 @@ const Users = () => {
                     </tbody>
                 </table>
                 <CardFooter className="border-t border-blue-gray-50 p-4 w-full mx-auto">
-                    <div className="flex gap-2 justify-center pagination">
-                        <Button variant="outlined" size="sm" className="p-1">
-                            <Icon icon="ic:round-arrow-left" className="h-6 w-6" />
-                        </Button>
-                        {[1, 2, "...", 9, 10].map((page) => (
-                            <IconButton key={page} variant={page === 1 ? "outlined" : "text"} size="sm">
-                                {page}
-                            </IconButton>
-                        ))}
-                        <Button variant="outlined" size="sm" className="p-1">
-                            <Icon icon="ic:round-arrow-right" className="h-6 w-6" />
-                        </Button>
-                    </div>
+                    <ButtonPagination />
                 </CardFooter>
             </div>
         </div>
