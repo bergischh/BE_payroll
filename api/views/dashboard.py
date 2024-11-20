@@ -116,3 +116,40 @@ class KaryawanDashboard(APIView):
             'total_tunjangan': jumlah_tunjangan,
         }
         return Response(data, status=status.HTTP_200_OK)
+    
+class calonKaryawanDashboard(APIView):
+    def get(self, request):
+        auth_header = request.headers.get('Authorization')
+        token = None
+
+        if auth_header and auth_header.startswith('Bearer '):
+            token = auth_header.split(' ')[1]  
+        else:
+            token = request.COOKIES.get('accessToken')  
+
+        if not token:
+            return Response({
+                "error": "Token tidak ada, tolong masukkan token"
+            })
+
+        try:
+            user_id = decode_access_token(token)
+        except AuthenticationFailed:
+            return Response({
+                "error": "Anda tidak memiliki akses."
+            }, status=status.HTTP_401_UNAUTHORIZED)
+
+        user = get_object_or_404(User, id=user_id)
+
+        if user.role != 'calon_karyawan':
+            return Response({"errors" : "Invalid user role"}, status=status.HTTP_403_FORBIDDEN)
+
+        calon_karyawan = get_object_or_404(CalonKaryawan, user=user)
+        data = {
+            "nama": calon_karyawan.nama_calonKaryawan,
+            "email": calon_karyawan.email,
+            "status_wawancara": calon_karyawan.get_status_wawancara_display(),
+        }
+
+        return Response(data, status=status.HTTP_200_OK)
+    

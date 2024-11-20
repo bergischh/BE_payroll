@@ -13,13 +13,15 @@ from .views.laporangaji_views import LaporanGajiView, LaporanGajiCreate, Laporan
 from .views.slipgaji_views import SlipGajiView, SlipGajiCreate, SlipGajiUpdate, SlipGajiDelete
 from .views.transaksi_views import TransactionView, TransactionCreate, TransactionUpdate, TransactionDelete
 from .views.company import KaryawanList, ProductCreate, ProductList, ProductUpdate, ProductDelete, RecruitmentView, RecruitmentCreate, RecruitmentUpdate, RecruitmentDelete, ToggleCompanyStatus
-from .views.dashboard import AdminandManagerDashboard, KaryawanDashboard
+from .views.dashboard import AdminandManagerDashboard, KaryawanDashboard, calonKaryawanDashboard
+# from .views.soal_views import 
 
 
 urlpatterns = [
     # dashboard 
     path('dashboard/admin/', AdminandManagerDashboard.as_view(), name='admin-dashboard'),  
     path('dashboard/karyawan/', KaryawanDashboard.as_view(), name='karyawan-dashboard'),  
+    path('dashboard/calonKaryawan/', calonKaryawanDashboard.as_view(), name='calon-karyawan-dashboard'),
 
 
     # user

@@ -115,8 +115,6 @@ class CalonKaryawanAccept(APIView):
             foto = candidate.photo
         )
 
-        candidate.delete()
-
         return Response({
             "message": "Karyawan berhasil diterima",
             "data": {

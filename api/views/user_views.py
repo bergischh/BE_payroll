@@ -108,7 +108,9 @@ class UpdateUserView(APIView):
             del request.data['username']
         if 'password' in request.data:
             del request.data['password']
-
+        if 'role' in request.data:
+            del request.data['role']
+  
         # Memproses data update
         serializer = UsersSerializer(user_to_update, data=request.data, partial=True)  
         if serializer.is_valid():
@@ -146,7 +148,7 @@ class LoginView(APIView):
         response.set_cookie(key='accessToken', value=access_token, httponly=True)
 
         return response
-    
+     
 class RefreshAPIView(APIView):
     def post(self, request):
         refresh_token = request.COOKIES.get('accessToken')

@@ -2,6 +2,7 @@ from django.db import models
 from django.core.validators import MinLengthValidator, MaxLengthValidator, RegexValidator
 import os
 from django.utils import timezone
+from .user_models import User
 
 def user_directory_path(instance, filename):
     timestamp = timezone.now().strftime('%Y%m%d_%H%M%S') 
@@ -60,6 +61,8 @@ class CalonKaryawan(models.Model):
     ijazah = models.FileField(upload_to=ijazah_upload_path, null=True, blank=True)
     status_wawancara = models.CharField(max_length=20, choices=StatusWawancara.choices, default=None, null=True, blank=True)
     upload_at = models.DateTimeField(auto_now_add=True)  
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='calonKaryawan_profiles')
 
     def save(self, *args, **kwargs):
         if self.pk: 
