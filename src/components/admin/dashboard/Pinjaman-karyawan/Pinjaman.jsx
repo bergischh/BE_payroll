@@ -1,6 +1,3 @@
-import SearchTable from "./components/SearchTable"
-import CardModal from "./components/CardModal"
-import { Icon } from "@iconify/react/dist/iconify.js"
 import { Button } from "@material-tailwind/react"
 import { useEffect, useState, useRef } from "react";
 import {
@@ -11,13 +8,17 @@ import {
     PopoverHandler,
     PopoverContent,
     Spinner,
+    Card,
+    CardBody,
 } from "@material-tailwind/react";
 import React from "react";
-import ButtonPagination from "./components/ButtonPagination";
-import { Link } from "react-router-dom";
+import { Icon } from "@iconify/react/dist/iconify.js";
+import ButtonPagination from "../components/ButtonPagination.jsx";
+import CardModal from "../components/CardModal.jsx";
+import SearchTable from "../components/SearchTable.jsx";
+import CardPinjam from "../components/CardPinjam.jsx";
 
-
-const DataKaryawan = () => {
+const Pinjaman = () => {
     const [selectedUser, setSelectedUser] = React.useState(null);
     const popoverRef = useRef(null); // Reference for popover content
 
@@ -49,13 +50,13 @@ const DataKaryawan = () => {
     }, [selectedUser]);
 
     const [users] = useState([
-        { id: 1, nama: "Innalillahi Aliyah", jabatan: "admin" },
-        { id: 2, nama: "Innalillahi Mata kiri", jabatan: "manager" },
-        { id: 3, nama: "Michael Jachkson", jabatan: "karyawan" },
-        { id: 4, nama: "user4", jabatan: "cal-karyawan" },
-        { id: 5, nama: "user5", jabatan: "admin" },
+        { id: 1,nik: 12222039, nama: "Innalillahi Aliyah", jumlah: 200000, tanggal: "29/07/2025", tenggat: "15/08/2025" },
+        { id: 2,nik: 12222039, nama: "Innalillahi Mata kiri", jumlah: 300000, tanggal: "29/07/2025", tenggat: "15/08/2025" },
+        { id: 3,nik: 12222039, nama: "Michael Jachkson", jumlah: 1000000, tanggal: "29/07/2025", tenggat: "15/08/2025" },
+        { id: 4,nik: 12222039, nama: "user4", jumlah: 50000, tanggal: "29/07/2025", tenggat: "15/08/2025" },
+        { id: 5,nik: 12222039, nama: "user5", jumlah: 200000, tanggal: "29/07/2025", tenggat: "15/08/2025" },
     ]);
-    const TABLE_HEAD = ["No", "Nama Karyawan", "Jabatan", "Action"];
+    const TABLE_HEAD = ["No", "NIK", "Nama Karyawan", "Jumlah", "Tanggal", "Tenggat", "Action"];
     
     // loading
     const [loading, setLoading] = useState(true);
@@ -76,18 +77,32 @@ const DataKaryawan = () => {
         <>
         <div className="flex flex-col h-screen">
             <div className="overflow-y-auto mac-scrollbar mac-scrollbar-x mac-scrollbar-y mb-20 pr-4">
-            <h1 className="text-gray-500 mt-5 mb-16">Data Karyawan</h1>
-            <div className="flex justify-between mb-3">
-                <SearchTable/>
-                <CardModal 
-                        toptitle="Tambah akun User"
-                        icon={<Icon icon="mdi:account" />}
-                        iconbtn="iconamoon:folder-add-light"
-                        ukiconbtn="h-6 w-6 color-white"
-                        backg="bg-[#7E679F]"
-                        wbtn="flex items-center gap-3 p-2"
-                        button={<Button color="blue" className="p-3">Reset</Button>}
-                    />
+            <div className="flex items-center justify-between mb-3">
+                <div className="">
+                    <h1 className="text-gray-500 mb-12">Pinjaman Karyawan</h1>
+                    <SearchTable /> 
+                </div>
+                
+                <Card className="w-3/6 border border-gray-400 max-h-[223px]">
+                    <CardBody className="px-3 py-4 overflow-auto">
+                        <Typography variant="h6" color="blue-gray" className=" flex">
+                        Approve Peminjaman
+                        <Button
+                            size="lg"
+                            variant="outlined"
+                            color="purple"
+                            className="flex gap-1 ml-auto items-center rounded-full py-1 px-3 text-black relative overflow-hidden"
+                        >
+                            <span className="absolute inset-0 bg-[#7E679F] opacity-40 rounded-full"></span>
+                                <Icon icon="subway:admin" className="h-4 w-4 text-[#7D7D7D] relative z-10" />
+                            <span className="relative z-10">4</span>
+                        </Button>
+                        </Typography>
+                        <CardPinjam onClick={handleClose}/>
+                        <CardPinjam onClick={handleClose}/>
+                        <CardPinjam onClick={handleClose}/>
+                    </CardBody>
+                </Card>
             </div>
             <table className="w-full min-w-max table-auto text-left">
                     <thead className="rounded-lg">
@@ -103,11 +118,16 @@ const DataKaryawan = () => {
                     </thead>
                     <tbody className="my-4 drop-shadow-md">
                         {users.length > 0 ? (
-                            users.map(({ id, nama, jabatan,  }, index) => (
+                            users.map(({ id, nik, nama, jumlah, tanggal, tenggat  }, index) => (
                                 <tr key={id}>
                                     <td className="p-4 border-b border-blue-gray-50">
                                         <Typography variant="small" color="blue-gray" className="font-bold">
                                             {index + 1}
+                                        </Typography>
+                                    </td>
+                                    <td className="p-4 border-b border-blue-gray-50">
+                                        <Typography variant="small" color="blue-gray" className="font-normal">
+                                            {nik}
                                         </Typography>
                                     </td>
                                     <td className="p-4 border-b border-blue-gray-50">
@@ -117,7 +137,17 @@ const DataKaryawan = () => {
                                     </td>
                                     <td className="p-4 border-b border-blue-gray-50">
                                         <Typography variant="small" color="blue-gray" className="font-normal">
-                                            {jabatan}
+                                            {jumlah}
+                                        </Typography>
+                                    </td>
+                                    <td className="p-4 border-b border-blue-gray-50">
+                                        <Typography variant="small" color="blue-gray" className="font-normal">
+                                            {tanggal}
+                                        </Typography>
+                                    </td>
+                                    <td className="p-4 border-b border-blue-gray-50">
+                                        <Typography variant="small" color="blue-gray" className="font-normal">
+                                            {tenggat}
                                         </Typography>
                                     </td>
                                     <td className="p-4 border-b border-blue-gray-50">
@@ -129,10 +159,6 @@ const DataKaryawan = () => {
                                             </PopoverHandler>
                                             <PopoverContent className="p-2" ref={popoverRef}>
                                                 <div className="flex flex-col gap-2">
-                                                    <Button color="blue" size="sm" onClick={handleClose} fullWidth className="flex px-2">
-                                                       <Icon icon="carbon:user-profile" className="h-4 w-4 mr-2" />
-                                                       <Link  to="/DetailKaryawan">Detail</Link>
-                                                    </Button>
                                                     <CardModal
                                                         toptitle="Form Registrasi"
                                                         icon={<Icon icon="mdi:account" />}
@@ -173,4 +199,4 @@ const DataKaryawan = () => {
     )
 }
 
-export default DataKaryawan
+export default Pinjaman

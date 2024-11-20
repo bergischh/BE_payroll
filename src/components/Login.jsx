@@ -5,6 +5,7 @@ import { Icon } from "@iconify/react";
 import { loginUser } from "../api/axios.js"; // Impor loginUser
 import { useNavigate } from "react-router-dom";
 import "./Fonts.css";
+import { Link } from "react-router-dom";
 
 function Login() {
   const { setAuth } = useContext(AuthContext);
@@ -135,7 +136,7 @@ function Login() {
                     <Icon
                       icon={showPassword ? "iconamoon:eye" : "iconamoon:eye-off"}
                       onClick={togglePasswordVisibility}
-                      className="absolute right-3 top-2/4 transform -translate-y-1/2 text-gray-500 cursor-pointer"
+                      className="absolute right-3 top-2/3 transform -translate-y-1/2 text-gray-500 cursor-pointer"
                     />
                   </div>
                   <div className="inline-flex items-center mb-4">
@@ -181,9 +182,9 @@ function Login() {
                 </form>
                 <p className="mx-auto text-center pt-5 pb-5">
                   Belum punya akun?{" "}
-                  <a href="#" className="text-blue-500">
+                  <Link to="/regis" className="text-blue-500">
                     Sign Up
-                  </a>
+                  </Link>
                 </p>
               </section>
             </div>

@@ -4,7 +4,9 @@ import Dashboard from '../admin/dashboard/Dashboard.jsx';
 import Users from '../admin/dashboard/Users.jsx';
 import DataKaryawan from './dashboard/DataKaryawan.jsx';
 import TunjanganKaryawan from './dashboard/TunjanganKaryawan.jsx';
-
+import Pinjaman from './dashboard/Pinjaman-karyawan/Pinjaman.jsx';
+import Pembayaran from './dashboard/Pinjaman-karyawan/Pembayaran.jsx';
+import React from 'react';
 const Sidebar = () => {
     const [open, setOpen] = useState(true);
     const [activePage, setActivePage] = useState("Dashboard");
@@ -19,8 +21,8 @@ const Sidebar = () => {
             title: "Pinjaman Karyawan",
             icon: "rivet-icons:money",
             subMenus: [
-                { title: "Pinjaman", icon: "mdi:cash" },
-                { title: "Pembayaran", icon: "mdi:credit-card" },
+                { title: "Pinjaman", icon: "solar:hand-money-outline", component: Pinjaman },
+                { title: "Pembayaran", icon: "fluent:payment-32-filled", component: Pembayaran },
             ],
         },
         { title: "Laporan Penggajian", icon: "tabler:report" },
@@ -28,8 +30,14 @@ const Sidebar = () => {
     ];
 
     const activeMenu = menus.find(
-        (menu) => menu.title === activePage || menu.subMenus?.some((sub) => sub.title === activePage)
+        (menu) =>
+            menu.title === activePage ||
+            menu.subMenus?.some((sub) => sub.title === activePage)
     );
+
+    const activeComponent =
+        activeMenu?.subMenus?.find((sub) => sub.title === activePage)?.component ||
+        activeMenu?.component;
 
     return (
         <div className="flex">
@@ -42,10 +50,18 @@ const Sidebar = () => {
                     onClick={() => setOpen(!open)}
                 />
                 <div>
-                    <img src="./img/vector-admin.png" alt="" className={`w-16 mx-auto duration-300 mt-8 ${!open && "pt-16 w-11"}`} />
+                    <img
+                        src="./img/vector-admin.png"
+                        alt=""
+                        className={`w-16 mx-auto duration-300 mt-8 ${!open && "pt-16 w-11"}`}
+                    />
                     <div className={`${!open && "border border-white w-8 mx-6 mt-5"}`}></div>
-                    <h1 className={`text-white text-center font-medium text-xl duration-300 mt-3 ${!open && "scale-0"}`}>Admin Payroll</h1>
-                    <h6 className={`text-white text-center font-medium duration-300 ${!open && "scale-0"}`}>Adminpayroll@gmail.com</h6>
+                    <h1 className={`text-white text-center font-medium text-xl duration-300 mt-3 ${!open && "scale-0"}`}>
+                        Admin Payroll
+                    </h1>
+                    <h6 className={`text-white text-center font-medium duration-300 ${!open && "scale-0"}`}>
+                        Adminpayroll@gmail.com
+                    </h6>
                 </div>
                 <ul className={`${!open && "mt-[-85px]"} mt-5 ms-4`}>
                     {menus.map((menu, index) => (
@@ -79,12 +95,12 @@ const Sidebar = () => {
                                         {menu.subMenus.map((subMenu, subIndex) => (
                                             <li
                                                 key={subIndex}
-                                                className={`flex items-center gap-x-2 py-2 px-2 rounded-md cursor-pointer text-white ${
+                                                className={`text-sm flex items-center gap-x-4 py-2 px-2 rounded-md cursor-pointer text-white ${
                                                     activePage === subMenu.title ? "bg-[#87789E] border border-white" : ""
                                                 }`}
                                                 onClick={() => setActivePage(subMenu.title)}
                                             >
-                                                <Icon icon={subMenu.icon} className="text-lg" />
+                                                <Icon icon={subMenu.icon} className="text-2xl" />
                                                 {subMenu.title}
                                             </li>
                                         ))}
@@ -100,7 +116,11 @@ const Sidebar = () => {
                     className="bg-white rounded-2xl content ps-5 pt-5 pb-5 pr-4 overflow-y-hidden"
                     style={{ height: "calc(100vh - 40px)" }}
                 >
-                    {activeMenu && activeMenu.component && <activeMenu.component open={open} />}
+                    {activeComponent ? (
+                        React.createElement(activeComponent, { open }) // Render component dynamically
+                    ) : (
+                        <p className="text-center text-gray-500">Pilih menu untuk ditampilkan.</p>
+                    )}
                 </div>
             </div>
         </div>

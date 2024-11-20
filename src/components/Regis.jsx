@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 // import axios from '../api/axios';
 import './Fonts.css';
 import { registerUser } from '../api/axios';
+import { Link } from 'react-router-dom';
 
 const REGISTER_URL = "api/register/";
 
@@ -124,7 +125,7 @@ const Regis = () => {
       className="card flex flex-col lg:flex-row items-center justify-center h-screen mx-auto w-full relative bg-cover bg-center"
       style={{ backgroundImage: "url('/img/latar-login.jpg')" }}
     >
-      <div className="flex flex-col px-3 lg:flex-row relative bg-white lg:pl-10 rounded-[30px] w-[90%] lg:w-auto">
+      <div className="flex flex-col lg:flex-row relative bg-white lg:pl-10 rounded-[30px] w-[90%] lg:w-auto">
         <div className="lg:hidden pt-10 w-full flex flex-col items-center">
           <img src="/img/logo.png" alt="logo" className="w-16 mb-5 pic-logo" />
           <img
@@ -241,9 +242,9 @@ const Regis = () => {
             </form>
             <p className="mx-auto text-center pt-5 pb-5">
               Already have an account?{" "}
-              <a href="#" className="text-blue-500">
+              <Link to="/login" className="text-blue-500">
                 Sign Up
-              </a>
+              </Link>
             </p>
           </div>
         </div>

@@ -26,21 +26,20 @@ const CardCheck = (props) => {
                     className="ms-2"
                 />
                 <div className="flex w-full flex-col">
-                <div className="flex items-center justify-between h-[20px]">
-    <Typography className="text-base" color="blue-gray">
-        {name}
-    </Typography>
-    <div className="flex items-center gap-0">
-        <p className="text-lg">Y</p>
-        <Checkbox color="green" />
-        <p className="text-lg">N</p>
-        <Checkbox
-            icon={<Icon icon="ph:x-bold" className="w-4 h-4" />}
-            className="bg-transparent checked:bg-red-700 border-red-700"
-        />
-    </div>
-</div>
-
+                    <div className="flex items-center justify-between h-[20px]">
+                        <Typography className="text-base" color="blue-gray">
+                            {name}
+                        </Typography>
+                        <div className="flex items-center gap-0">
+                            <p className="text-lg">Y</p>
+                            <Checkbox color="green" />
+                            <p className="text-lg">N</p>
+                            <Checkbox
+                                icon={<Icon icon="ph:x-bold" className="w-4 h-4" />}
+                                className="bg-transparent checked:bg-red-700 border-red-700"
+                            />
+                        </div>
+                    </div>
                     <Typography color="blue-gray" className="text-xs">{posisi}</Typography>
                 </div>
             </CardHeader>
