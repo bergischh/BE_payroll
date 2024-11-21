@@ -34,7 +34,7 @@ class RegisterView(APIView):
             email = request.data.get('email')
             password = request.data.get('password')
             role = request.data.get('role')  
-            confirm_password = request.POST.get('confirm_password')
+            confirm_password = request.data.get('confirm_password')
 
             if password != confirm_password:
                 return Response({
@@ -49,11 +49,6 @@ class RegisterView(APIView):
             if User.objects.filter(email=email).exists():
                 return Response({
                     'error': 'Email already exists'
-                }, status=status.HTTP_400_BAD_REQUEST)
-
-            if not role:
-                return Response({
-                    'error': 'Role is required'
                 }, status=status.HTTP_400_BAD_REQUEST)
             
             role = User.Role.CALON_KARYAWAN
@@ -96,14 +91,11 @@ class UpdateUserView(APIView):
     
         user = get_object_or_404(User, id=user_id)
 
-        # Check if the current user is an admin
-        if not user.is_staff:  # Assuming is_staff indicates admin status
+        if not user.is_staff:  
             return Response({'error': 'You do not have permission to perform this action.'}, status=status.HTTP_403_FORBIDDEN)
 
-        # Fetch the user to be updated
         user_to_update = get_object_or_404(User, id=kwargs['id'])
 
-        # Remove username and password from request data if they exist
         if 'username' in request.data:
             del request.data['username']
         if 'password' in request.data:
@@ -111,7 +103,6 @@ class UpdateUserView(APIView):
         if 'role' in request.data:
             del request.data['role']
   
-        # Memproses data update
         serializer = UsersSerializer(user_to_update, data=request.data, partial=True)  
         if serializer.is_valid():
             serializer.save()
@@ -124,12 +115,13 @@ class UpdateUserView(APIView):
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
     
+    
 class LoginView(APIView): 
      def post(self, request):
-        email = request.data.get('email')
+        username = request.data.get('username')
         password = request.data.get('password')
 
-        user = User.objects.filter(email=email).first()
+        user = User.objects.filter(username=username).first()
 
         if not user:
             raise APIException('Invalid credentials!')
@@ -142,7 +134,8 @@ class LoginView(APIView):
 
         response = Response({
             'message': 'Anda berhasil login',
-            'token': access_token
+            'token': access_token,
+            'role': user.role  # Pastikan model User memiliki field role
         })
 
         response.set_cookie(key='accessToken', value=access_token, httponly=True)

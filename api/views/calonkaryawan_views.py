@@ -19,14 +19,45 @@ class CalonKaryawanCreate(APIView):
     parser_classes = [MultiPartParser, FormParser]
 
     def post(self, request, *args, **kwargs):
-        serializer = CalonKaryawanSerializer(data=request.data)
-        if serializer.is_valid():
+       auth_header = request.headers.get('Authorization')
+       token = None
+
+       if auth_header and auth_header.startswith('Bearer '):
+            token = auth_header.split(' ')[1]  
+       else:
+            token = request.COOKIES.get('accessToken')  
+
+       if not token:
+             return Response({
+                "error": "Token tidak ada, tolong masukkan token"
+            })
+        
+       try:
+            user_id = decode_access_token(token)
+       except exceptions.AuthenticationFailed as e:
+            return Response({
+                "error": "Anda tidak memiliki akses."
+            }, status=status.HTTP_401_UNAUTHORIZED)
+       
+       user = get_object_or_404(User, id=user_id) 
+
+       if not user:
+            return Response({'error': 'User not found'}, status=404)
+       
+       if user.role != 'calon_karyawan' :
+         return Response({
+                "error": "Invalid user role"
+         }, status=status.HTTP_403_FORBIDDEN)
+    
+
+       serializer = CalonKaryawanSerializer(data=request.data)
+       if serializer.is_valid():
             serializer.save()
             return Response({
                 "message": "Berhasil menambah data",
                 "data": serializer.data
             }, status=status.HTTP_201_CREATED)
-        return Response({
+       return Response({
             "errors": serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
 
