@@ -7,6 +7,8 @@ import TunjanganKaryawan from './dashboard/TunjanganKaryawan.jsx';
 import Pinjaman from './dashboard/Pinjaman-karyawan/Pinjaman.jsx';
 import Pembayaran from './dashboard/Pinjaman-karyawan/Pembayaran.jsx';
 import React from 'react';
+import Recruitment from './dashboard/Recruitmen.jsx';
+
 const Sidebar = () => {
     const [open, setOpen] = useState(true);
     const [activePage, setActivePage] = useState("Dashboard");
@@ -26,7 +28,7 @@ const Sidebar = () => {
             ],
         },
         { title: "Laporan Penggajian", icon: "tabler:report" },
-        { title: "Recruitmen", icon: "fluent-mdl2:recruitment-management" },
+        { title: "Recruitmen", icon: "fluent-mdl2:recruitment-management", component: Recruitment },
     ];
 
     const activeMenu = menus.find(

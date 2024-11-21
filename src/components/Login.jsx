@@ -2,10 +2,10 @@ import { useRef, useState, useEffect, useContext } from "react";
 import AuthContext from "../context-Api/AuthProvider.jsx";
 import { Input, Button } from "@material-tailwind/react";
 import { Icon } from "@iconify/react";
-import { loginUser } from "../api/axios.js"; // Impor loginUser
+import { loginUser } from "../api/axios.js"; // Import loginUser
 import { useNavigate } from "react-router-dom";
-import "./Fonts.css";
 import { Link } from "react-router-dom";
+import "./Fonts.css";
 
 function Login() {
   const { setAuth } = useContext(AuthContext);
@@ -32,52 +32,18 @@ function Login() {
     try {
       const response = await loginUser({ username: user, password: pwd });
       console.log(response);
-      
-      if (response && response.data && response.data.token) {
-        const accessToken = response.data.token;
-        const role = response.data.role;
-        setAuth({ user, role, accessToken });
-  
-        // Ubah state success menjadi true setelah login berhasil
+
+      if (response.status === 200) {
         setSuccess(true);
-  
-        // Redirect based on the role
-        console.log("Navigating to:", role.includes("admin") ? "/adminSidebar" : "/company");
-        if (role.includes("admin")) {
-          navigate("/adminSidebar");
-        } else {
-          navigate("/company");
-        }
-        
-  
-        // Reset form fields
         setUser("");
         setPwd("");
-      } else {
-        setErrMsg("Login Failed");
-        errRef.current.focus();
-        console.log(response);
+        navigate("/adminSidebar"); // Redirect after successful login
       }
     } catch (err) {
-      if (err.response) {  // Ada respons dari server tetapi dengan status error
-        if (err.response.status === 400) {
-          setErrMsg("Missing Username or Password");
-        } else if (err.response.status === 401) {
-          setErrMsg("Unauthorized");
-        } else {
-          setErrMsg("Login Failed");
-        }
-      } else if (err.request) {  // Request dikirim tetapi tidak ada respons dari server
-        setErrMsg("No Server Response");
-      } else {  // Error terjadi saat membuat request
-        setErrMsg("Login Failed");
-      }
+      setErrMsg("Login Failed");
       errRef.current.focus();
     }
-    
   };
-  
-  
 
   const togglePasswordVisibility = () => {
     setShowPassword((prevShowPassword) => !prevShowPassword);
@@ -134,7 +100,9 @@ function Login() {
                       placeholder="Password"
                     />
                     <Icon
-                      icon={showPassword ? "iconamoon:eye" : "iconamoon:eye-off"}
+                      icon={
+                        showPassword ? "iconamoon:eye" : "iconamoon:eye-off"
+                      }
                       onClick={togglePasswordVisibility}
                       className="absolute right-3 top-2/3 transform -translate-y-1/2 text-gray-500 cursor-pointer"
                     />

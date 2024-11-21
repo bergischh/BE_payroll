@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 // import axios from '../api/axios';
 import './Fonts.css';
 import { registerUser } from '../api/axios';
+import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
 const REGISTER_URL = "api/register/";
@@ -11,7 +12,7 @@ const Regis = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [confirm_password, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   const [validUsername, setValidUsername] = useState(false);
@@ -24,6 +25,7 @@ const Regis = () => {
 
   const userRef = useRef();
   const [errMsg, setErrMsg] = useState("");
+  const navigate = useNavigate()
   const [success, setSuccess] = useState(false); // State untuk pendaftaran berhasil
 
   const usernameRegex = /^[A-Za-z][A-Za-z0-9_]{3,23}$/;
@@ -40,12 +42,12 @@ const Regis = () => {
 
   useEffect(() => {
     setValidPassword(passwordRegex.test(password));
-    setValidMatch(password === confirmPassword);
-  }, [password, confirmPassword]);
+    setValidMatch(password === confirm_password);
+  }, [password, confirm_password]);
 
   useEffect(() => {
     setErrMsg("");
-  }, [username, password, confirmPassword]);
+  }, [username, password, confirm_password]);
 
   const togglePasswordVisibility = () => {
     setShowPassword((prevShowPassword) => !prevShowPassword);
@@ -69,35 +71,43 @@ const Regis = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent page reload
-    
+
     const v1 = emailRegex.test(email);
     const v2 = usernameRegex.test(username);
     const v3 = passwordRegex.test(password);
-    
-    // Menampilkan pesan error jika ada input yang tidak valid
+
     if (!v1 || !v2 || !v3) {
       setErrMsg("Invalid Entry");
       console.log("Debugging: Invalid input entry");
       console.log({
         email: v1,
         username: v2,
-        password: v3
+        password: v3,
       });
       return; // Menghentikan proses jika ada input yang tidak valid
     }
-  
+
     try {
-      const result = await registerUser({ email, username, password });
-      console.log(result);
-      setSuccess(true);
-      setEmail("");
-      setUsername("");
-      setPassword("");
-      setConfirmPassword("");
+      const result = await registerUser({
+        email,
+        username,
+        password,
+        confirm_password,
+      });
+
+      // Pastikan untuk mengecek apakah status 201 (berhasil)
+      if (result.status === 201) {
+        setSuccess(true);
+        setEmail("");
+        setUsername("");
+        setPassword("");
+        setConfirmPassword("");
+        navigate("/login"); // Pindah ke halaman login setelah berhasil
+      }
     } catch (err) {
       console.error("Error response:", err.response);
       console.log("Debugging: Registration error");
-    
+
       if (!err?.response) {
         setErrMsg("No Server Response");
         console.log("No server response");
@@ -108,24 +118,30 @@ const Regis = () => {
         setErrMsg("Username Taken");
         console.log("Debugging: Username taken");
       } else if (err.response?.data) {
-        setErrMsg(`Registration Failed: ${err.response.data.detail || "Check input fields"}`);
-        console.log("Debugging: Error message", err.response.data.detail || "Check input fields");
+        setErrMsg(
+          `Registration Failed: ${
+            err.response.data.detail || "Check input fields"
+          }`
+        );
+        console.log(
+          "Debugging: Error message",
+          err.response.data.detail || "Check input fields"
+        );
       } else {
         setErrMsg("Registration Failed");
         console.log("Debugging: Registration failed");
       }
       userRef.current.focus();
     }
-    
   };
+
   
    
   return (
     <div
       className="card flex flex-col lg:flex-row items-center justify-center h-screen mx-auto w-full relative bg-cover bg-center"
-      style={{ backgroundImage: "url('/img/latar-login.jpg')" }}
-    >
-      <div className="flex flex-col lg:flex-row relative bg-white lg:pl-10 rounded-[30px] w-[90%] lg:w-auto">
+      style={{ backgroundImage: "url('/img/latar-login.jpg')" }}>
+      <div className="flex flex-col px-3 lg:flex-row relative bg-white lg:pl-10 rounded-[30px] w-[90%] lg:w-auto">
         <div className="lg:hidden pt-10 w-full flex flex-col items-center">
           <img src="/img/logo.png" alt="logo" className="w-16 mb-5 pic-logo" />
           <img
@@ -218,17 +234,17 @@ const Regis = () => {
               <div className="mb-4">
                 <input
                   type="password"
-                  id="confirmPassword"
+                  id="confirm_password"
                   placeholder="Confirm Password"
-                  name="confirmPassword"
+                  name="confirm_password"
                   className="mt-1 block w-full px-3 py-2 border border-gray-400 shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
-                  value={confirmPassword}
+                  value={confirm_password}
                   onChange={handleConfirmPasswordChange}
                   onFocus={() => setMatchFocus(true)}
                   onBlur={() => setMatchFocus(false)}
                   aria-invalid={!validMatch ? "true" : "false"}
                 />
-                {matchFocus && confirmPassword && !validMatch && (
+                {matchFocus && confirm_password && !validMatch && (
                   <p className="text-red-500 text-sm">Passwords must match.</p>
                 )}
               </div>
@@ -243,7 +259,7 @@ const Regis = () => {
             <p className="mx-auto text-center pt-5 pb-5">
               Already have an account?{" "}
               <Link to="/login" className="text-blue-500">
-                Sign Up
+                Sign In
               </Link>
             </p>
           </div>
