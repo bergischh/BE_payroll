@@ -57,20 +57,46 @@ const Users = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    // kode yang bener nangkep API nya array
+    // useEffect(() => {
+    //     const getUsers = async () => {
+    //         try {
+    //             setLoading(true);
+    //             const data = await fetchUsers();
+    //             console.log("Fetched users:", data); // Debug respons API
+    //             setUsers(data); // Set users ke state
+    //         } catch (error) {
+    //             console.error("Error fetching users:", error);
+    //             setError(error.message || "Failed to fetch users");
+    //         } finally {
+    //             setLoading(false);
+    //         }
+    //     };
+    
+    //     getUsers();
+    // }, []);
+
+    //kode cadangan tangkap api objek tunggal bukan array(jdi cuman bisa ambil satu data objek)
+    // ada perbaikan di backend supaya api yang dikirim bukan objek tunggal
     useEffect(() => {
         const getUsers = async () => {
             try {
+                setLoading(true);
                 const data = await fetchUsers();
-                setUsers(data); // Set users data
-                setLoading(false); // Set loading to false
+                console.log("Fetched users:", data);
+                setUsers(Array.isArray(data) ? data : [data]); // Membungkus data dalam array jika bukan array
             } catch (error) {
-                setError('Failed to fetch users');
+                console.error("Error fetching users:", error);
+                setError(error.message || "Failed to fetch users");
+            } finally {
                 setLoading(false);
-                console.log(error)
             }
         };
-        getUsers(); // Fetch users when component mounts
+    
+        getUsers();
     }, []);
+    
+    
 
     if (loading) {
         return (

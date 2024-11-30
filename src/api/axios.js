@@ -1,5 +1,6 @@
 import axios from 'axios';
 import Cookies from "js-cookie"
+import { useEffect } from 'react';
 
 // URL API diambil dari .env
 const apiUrl = "http://127.0.0.1:8000/";
@@ -31,6 +32,14 @@ export const registerUser = async (userData) => {
 export const loginUser = async (userData) => {
   try {
     const response = await axios.post(`${apiUrl}api/login/`, userData);
+
+    // Tangkap token dari respons API
+    const token = response.data.token;
+
+    // Simpan token ke cookie
+    Cookies.set("token", token, { expires: 1 }); // Token berlaku 1 hari
+    console.log("Token saved to cookies:", token); // Debug
+
     return response;
 
   } catch (error) {
@@ -48,17 +57,58 @@ export const loginUser = async (userData) => {
 };
 
 // Fungsi untuk fetch users
-// export const fetchUsers = async () => {
+export const fetchUsers = async () => {
+  try {
+      const token = Cookies.get("token"); // Gunakan Cookies.get untuk mengambil token
+      console.log("Token:", token); // Debug token
+      const response = await axios.get(`${apiUrl}api/user/`, {
+          headers: {
+              Authorization: `Bearer ${token}`,
+          },
+      });
+      console.log("API response data:", response.data);
+      return response.data;
+  } catch (error) {
+      console.error("Error fetching users:", error);
+      throw error;
+  }
+};
+
+// Fungsi untuk fetch datakaryawan
+export const fetchDataKaryawan = async () => {
+  try {
+      const token = Cookies.get("token"); // Gunakan Cookies.get untuk mengambil token
+      console.log("Token:", token); // Debug token
+      const response = await axios.get(`${apiUrl}api/karyawan/`, {
+          headers: {
+              Authorization: `Bearer ${token}`,
+          },
+      });
+      console.log("API response data:", response.data);
+      return response.data;
+  } catch (error) {
+      console.error("Error fetching users:", error);
+      throw error;
+  }
+};
+
+// Fungsi untuk menambahkan data karyawan
+// export const addDataKaryawan = async (karyawanData) => {
 //   try {
-//       const token = Cookies.get("token"); // Gunakan Cookies.get untuk mengambil token
-//       const response = await axios.get(`${apiUrl}api/users/`, {
-//           headers: {
-//               Authorization: `Bearer ${token}`,
-//           },
-//       });
-//       return response.data;
+//     const token = Cookies.get("token"); // Ambil token dari Cookies
+//     console.log("Token:", token); // Debug token
+//     const response = await axios.post(`${apiUrl}api/karyawan/`, karyawanData, {
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//       },
+//     });
+//     console.log("API response data (karyawan added):", response.data);
+//     return response.data; // Kembalikan data response
 //   } catch (error) {
-//       console.error("Error fetching users:", error);
-//       throw error;
+//     console.error("Error adding karyawan:", error);
+//     throw error;
 //   }
 // };
+
+
+

@@ -8,11 +8,14 @@ import Pinjaman from './dashboard/Pinjaman-karyawan/Pinjaman.jsx';
 import Pembayaran from './dashboard/Pinjaman-karyawan/Pembayaran.jsx';
 import React from 'react';
 import Recruitment from './dashboard/Recruitmen.jsx';
+import DetailKaryawan from './dashboard/DetailKaryawan.jsx';
+
 
 const Sidebar = () => {
     const [open, setOpen] = useState(true);
     const [activePage, setActivePage] = useState("Dashboard");
     const [openAccordion, setOpenAccordion] = useState(null); // Track which accordion is open
+    const [detailView, setDetailView] = useState(null);
 
     const menus = [
         { title: "Dashboard", icon: "ion:home", component: Dashboard },
@@ -38,8 +41,8 @@ const Sidebar = () => {
     );
 
     const activeComponent =
-        activeMenu?.subMenus?.find((sub) => sub.title === activePage)?.component ||
-        activeMenu?.component;
+        activeMenu?.subMenus?.find((sub) => sub.title === activePage)?.component || activeMenu?.component;
+
 
     return (
         <div className="flex">

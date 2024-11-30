@@ -15,6 +15,7 @@ import {
 import React from "react";
 import ButtonPagination from "./components/ButtonPagination";
 import { Link } from "react-router-dom";
+import { fetchDataKaryawan } from "../../../api/axios";
 
 
 const DataKaryawan = () => {
@@ -48,13 +49,35 @@ const DataKaryawan = () => {
         };
     }, [selectedUser]);
 
-    const [users] = useState([
-        { id: 1, nama: "Innalillahi Aliyah", jabatan: "admin" },
-        { id: 2, nama: "Innalillahi Mata kiri", jabatan: "manager" },
-        { id: 3, nama: "Michael Jachkson", jabatan: "karyawan" },
-        { id: 4, nama: "user4", jabatan: "cal-karyawan" },
-        { id: 5, nama: "user5", jabatan: "admin" },
-    ]);
+    // State for dataKaryawan, loading, and error
+    const [dataKaryawan, setDataKaryawan] = useState([]);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const getUsers = async () => {
+            try {
+                setLoading(true);
+                const data = await fetchDataKaryawan();
+                console.log("Fetched users:", data); // Debug respons API
+                setDataKaryawan(data); // Set users ke state
+            } catch (error) {
+                console.error("Error fetching users:", error);
+                setError(error.message || "Failed to fetch users");
+            } finally {
+                setLoading(false);
+            }
+        };
+    
+        getUsers();
+    }, []);
+
+    // const [users] = useState([
+    //     { id: 1, nama: "Innalillahi Aliyah", jabatan: "admin" },
+    //     { id: 2, nama: "Innalillahi Mata kiri", jabatan: "manager" },
+    //     { id: 3, nama: "Michael Jachkson", jabatan: "karyawan" },
+    //     { id: 4, nama: "user4", jabatan: "cal-karyawan" },
+    //     { id: 5, nama: "user5", jabatan: "admin" },
+    // ]);
     const TABLE_HEAD = ["No", "Nama Karyawan", "Jabatan", "Action"];
     
     // loading
@@ -72,6 +95,11 @@ const DataKaryawan = () => {
             </div>
         );
     }
+
+    if (error) {
+        return <div className="text-center">{error}</div>;
+    }
+
     return (
         <>
         <div className="flex flex-col h-screen">
@@ -80,7 +108,7 @@ const DataKaryawan = () => {
             <div className="flex justify-between mb-3">
                 <SearchTable/>
                 <CardModal 
-                        toptitle="Tambah akun User"
+                        toptitle="Tambah data karyawan"
                         icon={<Icon icon="mdi:account" />}
                         iconbtn="iconamoon:folder-add-light"
                         ukiconbtn="h-6 w-6 color-white"
@@ -102,8 +130,8 @@ const DataKaryawan = () => {
                         </tr>
                     </thead>
                     <tbody className="my-4 drop-shadow-md">
-                        {users.length > 0 ? (
-                            users.map(({ id, nama, jabatan,  }, index) => (
+                        {dataKaryawan.length > 0 ? (
+                            dataKaryawan.map(({ id, nama_karyawan, jabatan,  }, index) => (
                                 <tr key={id}>
                                     <td className="p-4 border-b border-blue-gray-50">
                                         <Typography variant="small" color="blue-gray" className="font-bold">
@@ -112,7 +140,7 @@ const DataKaryawan = () => {
                                     </td>
                                     <td className="p-4 border-b border-blue-gray-50">
                                         <Typography variant="small" color="blue-gray" className="font-normal">
-                                            {nama}
+                                            {nama_karyawan}
                                         </Typography>
                                     </td>
                                     <td className="p-4 border-b border-blue-gray-50">
@@ -121,9 +149,9 @@ const DataKaryawan = () => {
                                         </Typography>
                                     </td>
                                     <td className="p-4 border-b border-blue-gray-50">
-                                        <Popover placement="bottom-end" open={selectedUser?.id === id} handler={() => handleOpen({ id, nama })}>
+                                        <Popover placement="bottom-end" open={selectedUser?.id === id} handler={() => handleOpen({ id, nama_karyawan })}>
                                             <PopoverHandler>
-                                                <IconButton variant="text" onClick={() => handleOpen({ id, nama })}>
+                                                <IconButton variant="text" onClick={() => handleOpen({ id, nama_karyawan })}>
                                                     <Icon icon="basil:other-1-outline" className="w-4 h-4"/>
                                                 </IconButton>
                                             </PopoverHandler>
@@ -134,7 +162,7 @@ const DataKaryawan = () => {
                                                        <Link  to="/DetailKaryawan">Detail</Link>
                                                     </Button>
                                                     <CardModal
-                                                        toptitle="Form Registrasi"
+                                                        toptitle="Edit Data Karyawan"
                                                         icon={<Icon icon="mdi:account" />}
                                                         namabtn="Edit"
                                                         iconbtn="tabler:edit"
