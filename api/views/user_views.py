@@ -10,20 +10,50 @@ from ..serializers import UsersSerializer
 from ..models import User
 from ..authentication import create_access_token, create_refresh_token, decode_access_token, decode_refresh_token
 
+
 class UserAPIView(APIView):
     def get(self, request):
-        auth = get_authorization_header(request).split()
+        # Ambil token dari header atau cookies
+        auth_header = request.headers.get('Authorization')
+        token = None
 
-        if auth and len(auth) == 2:
-            token = auth[1].decode('utf-8')
-            id = decode_access_token(token)
+        if auth_header and auth_header.startswith('Bearer '):
+            token = auth_header.split(' ')[1]  
+        else:
+            token = request.COOKIES.get('accessToken')  
 
-            user = User.objects.filter(pk=id).first()
+        if not token:
+            return Response(
+                {"error": "Token tidak ada, tolong masukkan token"},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+        
+        try:
+            user_id = decode_access_token(token)  # Decode token untuk mendapatkan ID pengguna
+        except AuthenticationFailed:
+            return Response(
+                {"error": "Anda tidak memiliki akses."},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
 
-            return Response(UsersSerializer(user).data)
+        # Dapatkan data pengguna berdasarkan ID dari token
+        user = get_object_or_404(User, id=user_id)
 
-        raise AuthenticationFailed('unauthenticated')
-    
+        # Logika berdasarkan peran pengguna
+        if user.role in ['admin', 'manager']:
+            users = User.objects.all()  # Admin dan Manager melihat semua pengguna
+        elif user.role == 'karyawan':
+            users = User.objects.filter(id=user.id)  # Karyawan hanya melihat data mereka sendiri
+        else:
+            return Response(
+                {"error": "Peran pengguna tidak valid"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        # Serialize data pengguna
+        serializer = UsersSerializer(users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class RegisterView(APIView):
     def post(self, request):
@@ -115,9 +145,9 @@ class UpdateUserView(APIView):
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
     
-    
+
 class LoginView(APIView): 
-     def post(self, request):
+    def post(self, request):
         username = request.data.get('username')
         password = request.data.get('password')
 
@@ -134,13 +164,19 @@ class LoginView(APIView):
 
         response = Response({
             'message': 'Anda berhasil login',
+            'role': user.role,
             'token': access_token,
-            'role': user.role  # Pastikan model User memiliki field role
         })
 
-        response.set_cookie(key='accessToken', value=access_token, httponly=True)
-
+        response.set_cookie(
+            key='accessToken', 
+            value=access_token, 
+            httponly=True, 
+            secure=True, # Only for HTTPS; set secure=False for HTTP in development
+            samesite='None',  # Important for cross-origin requests
+        )   
         return response
+
      
 class RefreshAPIView(APIView):
     def post(self, request):
