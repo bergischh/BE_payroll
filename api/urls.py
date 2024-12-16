@@ -1,7 +1,7 @@
 from django.urls import path
 
 
-from .views.user_views import RegisterView, LoginView, UserAPIView, RefreshAPIView, LogoutView, UpdateUserView
+from .views.user_views import RegisterView, LoginView, UserAPIView, RefreshAPIView, LogoutView, UpdateUserView, UserDelete
 from .views.karyawan_views import KaryawanViews, KaryawanCreate, KaryawanUpdate, KaryawanDelete
 from .views.departement_views import DepartementView, DepartementCreate, DepartmentUpdate, DepartmentDelete
 from .views.calonkaryawan_views import CalonKaryawanView, CalonKaryawanCreate, CalonKaryawanUpdate, CalonKaryawanDelete, CalonKaryawanAccept, CalonKaryawanReject
@@ -29,6 +29,7 @@ urlpatterns = [
     path('login/', LoginView.as_view(), name='login-users'),  
     path('update-account/<int:id>/', UpdateUserView.as_view(), name='update-users'),  
     path('user/', UserAPIView.as_view(), name='users'),  
+    path('delete-user/', UserDelete.as_view(), name='user-delete'),  
     path('refresh/', RefreshAPIView.as_view(), name='refresh-token'),
     path('logout/', LogoutView.as_view(), name='logout-users'),
 

@@ -145,7 +145,7 @@ class UpdateUserView(APIView):
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
     
-class DepartmentDelete(APIView):
+class UserDelete(APIView):
     def put(self, request, *args, **kwargs):
         auth_header = request.headers.get('Authorization')
         token = None
@@ -174,14 +174,14 @@ class DepartmentDelete(APIView):
             }, status=status.HTTP_404_NOT_FOUND)
 
         user_id = kwargs.get('id')
-        departments = get_object_or_404(User, id=user_id)
+        user = get_object_or_404(User, id=user_id)
 
         if user.role not in ['admin', 'manager']:
             return Response({
                 "error": "Invalid user role"
             }, status=status.HTTP_403_FORBIDDEN)
 
-        departments.delete()
+        user.delete()
         return Response({
             "message" : "Berhasil menghapus data"
         }, status=status.HTTP_204_NO_CONTENT)

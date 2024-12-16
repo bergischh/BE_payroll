@@ -169,7 +169,7 @@ class DepartmentDelete(APIView):
         department_id = kwargs.get('id')
         departments = get_object_or_404(Departement, id=department_id)
 
-        if user.role in ['admin', 'manager']:
+        if user.role not in ['admin', 'manager']:
             return Response({
                 "error": "Invalid user role"
             }, status=status.HTTP_403_FORBIDDEN)
