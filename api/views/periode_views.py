@@ -175,7 +175,7 @@ class PeriodeDelete(APIView):
         periode_id = kwargs.get('id')
         periode = get_object_or_404(PeriodeGaji, id=periode_id)
 
-        if user.role in ['admin', 'manager']:
+        if user.role not in ['admin', 'manager']:
             return Response({
                 "error": "Invalid user role"
             }, status=status.HTTP_403_FORBIDDEN)

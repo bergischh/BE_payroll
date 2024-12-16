@@ -18,25 +18,20 @@ class AdminandManagerDashboard(APIView):
             token = request.COOKIES.get('accessToken')  
 
         if not token:
-            return Response({
-                "error": "Token tidak ada, tolong masukkan token"
-            })
+            return Response({"error": "Token tidak ada, tolong masukkan token"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             user_id = decode_access_token(token)
         except AuthenticationFailed:
-            return Response({
-                "error": "Anda tidak memiliki akses."
-            }, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"error": "Anda tidak memiliki akses."}, status=status.HTTP_401_UNAUTHORIZED)
 
         user = get_object_or_404(User, id=user_id)
 
         if user.role != 'admin':
-            return Response({"errors" : "Invalid user role"}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"errors": "Invalid user role"}, status=status.HTTP_403_FORBIDDEN)
 
-        total_karyawan = Karyawan.objects.count()
-        total_recruitment = CalonKaryawan.objects.count()
-        # pending_kehadiran = list(Kehadiran.objects.filter(is_approved=None).values())
+        total_karyawan = Karyawan.objects.count() or 0
+        total_recruitment = CalonKaryawan.objects.count() or 0
         total_pinjaman = Pinjaman.objects.aggregate(Sum('jumlah_pinjaman'))['jumlah_pinjaman__sum'] or 0
 
         tunjangan_totals = Tunjangan.objects.aggregate(
@@ -53,13 +48,10 @@ class AdminandManagerDashboard(APIView):
             'total_karyawan': total_karyawan,
             'total_recruitment': total_recruitment,
             'total_pinjaman': total_pinjaman,
-            # 'pending_kehadiran': pending_kehadiran,
             'total_tunjangan': jumlah_tunjangan
         }
-        return Response({
-            "message": "Berhasil mengambil data",
-            "data": data
-        }, status=status.HTTP_200_OK)
+        return Response({"message": "Berhasil mengambil data", "data": data}, status=status.HTTP_200_OK)
+
     
 
 class KaryawanDashboard(APIView):
