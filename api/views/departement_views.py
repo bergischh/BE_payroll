@@ -139,7 +139,7 @@ class DepartmentUpdate(APIView):
         }, status=status.HTTP_400_BAD_REQUEST)
     
 class DepartmentDelete(APIView):
-    def put(self, request, *args, **kwargs):
+    def delete(self, request, *args, **kwargs):
         auth_header = request.headers.get('Authorization')
         token = None
 
@@ -161,10 +161,6 @@ class DepartmentDelete(APIView):
             }, status=status.HTTP_401_UNAUTHORIZED)
 
         user = get_object_or_404(User, id=user_id)
-        if user is None:
-            return Response({
-                "error": "User tidak ditemukan"
-            }, status=status.HTTP_404_NOT_FOUND)
 
         department_id = kwargs.get('id')
         departments = get_object_or_404(Departement, id=department_id)

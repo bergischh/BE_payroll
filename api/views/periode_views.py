@@ -172,16 +172,14 @@ class PeriodeDelete(APIView):
                 "error": "User tidak ditemukan"
             }, status=status.HTTP_404_NOT_FOUND)
 
-        periode_id = kwargs.get('id')
-        periode = get_object_or_404(PeriodeGaji, id=periode_id)
+        id = kwargs.get('id')
+        periode= get_object_or_404(PeriodeGaji, id=id)
 
         if user.role not in ['admin', 'manager']:
             return Response({
                 "error": "Invalid user role"
             }, status=status.HTTP_403_FORBIDDEN)
     
-        id = kwargs.get('id')
-        periode= get_object_or_404(PeriodeGaji, id=id)
 
         periode.delete()
         return Response({
