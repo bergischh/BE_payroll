@@ -13,7 +13,7 @@ import Index from './components/company/home/Index.jsx'
 import Pendiri from './components/company/content/content-compo/Pendiri.jsx'
 import Latar from './components/company/content/content-compo/Latar.jsx'
 import Sidebar from './components/admin/Sidebar.jsx'
-import DetailKaryawan from './components/admin/dashboard/DetailKaryawan.jsx'
+import DataKaryawan from './components/admin/dashboard/DataKaryawan.jsx'
 
 const router = createBrowserRouter([
   {
@@ -57,8 +57,8 @@ const router = createBrowserRouter([
     element: <Index />,
   },
   {
-    path:"/DetailKaryawan",
-    element: <DetailKaryawan />,
+    path:"/DataKaryawan",
+    element: <DataKaryawan />,
   },
 ])
 

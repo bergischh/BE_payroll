@@ -18,7 +18,7 @@ import { Link } from "react-router-dom";
 import { fetchDataKaryawan } from "../../../api/axios";
 
 
-const DataKaryawan = () => {
+const DataKaryawan = ({ onAllowDetail }) => {
     const [selectedUser, setSelectedUser] = React.useState(null);
     const popoverRef = useRef(null); // Reference for popover content
 
@@ -157,9 +157,12 @@ const DataKaryawan = () => {
                                             </PopoverHandler>
                                             <PopoverContent className="p-2" ref={popoverRef}>
                                                 <div className="flex flex-col gap-2">
-                                                    <Button color="blue" size="sm" onClick={handleClose} fullWidth className="flex px-2">
+                                                    <Button color="blue" size="sm" onClick={() => {
+                                                            handleClose();
+                                                            onAllowDetail();
+                                                        }} fullWidth className="flex px-2">
                                                        <Icon icon="carbon:user-profile" className="h-4 w-4 mr-2" />
-                                                       <Link  to="/DetailKaryawan">Detail</Link>
+                                                       <Link>Detail</Link>
                                                     </Button>
                                                     <CardModal
                                                         toptitle="Edit Data Karyawan"

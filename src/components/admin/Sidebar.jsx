@@ -1,26 +1,36 @@
-import { Icon } from '@iconify/react';
-import { useState } from 'react';
-import Dashboard from '../admin/dashboard/Dashboard.jsx';
-import Users from '../admin/dashboard/Users.jsx';
-import DataKaryawan from './dashboard/DataKaryawan.jsx';
-import TunjanganKaryawan from './dashboard/TunjanganKaryawan.jsx';
-import Pinjaman from './dashboard/Pinjaman-karyawan/Pinjaman.jsx';
-import Pembayaran from './dashboard/Pinjaman-karyawan/Pembayaran.jsx';
-import React from 'react';
-import Recruitment from './dashboard/Recruitmen.jsx';
-import DetailKaryawan from './dashboard/DetailKaryawan.jsx';
-
+import { Icon } from "@iconify/react";
+import { useState } from "react";
+import React from "react";
+import Dashboard from "../admin/dashboard/Dashboard.jsx";
+import Users from "../admin/dashboard/Users.jsx";
+import DataKaryawan from "./dashboard/DataKaryawan.jsx";
+import TunjanganKaryawan from "./dashboard/TunjanganKaryawan.jsx";
+import Pinjaman from "./dashboard/Pinjaman-karyawan/Pinjaman.jsx";
+import Pembayaran from "./dashboard/Pinjaman-karyawan/Pembayaran.jsx";
+import Recruitment from "./dashboard/Recruitmen.jsx";
+import DetailKaryawan from "./dashboard/DetailKaryawan.jsx";
 
 const Sidebar = () => {
     const [open, setOpen] = useState(true);
     const [activePage, setActivePage] = useState("Dashboard");
     const [openAccordion, setOpenAccordion] = useState(null); // Track which accordion is open
-    const [detailView, setDetailView] = useState(null);
+    const [allowDetailAccess, setAllowDetailAccess] = useState(false); // Track if DetailKaryawan access is allowed
 
     const menus = [
         { title: "Dashboard", icon: "ion:home", component: Dashboard },
         { title: "Users", icon: "la:users-cog", component: Users },
-        { title: "Data Karyawan", icon: "ic:baseline-people-alt", component: DataKaryawan },
+        {
+            title: "Data Karyawan",
+            icon: "ic:baseline-people-alt",
+            component: () => (
+                <DataKaryawan
+                    onAllowDetail={() => {
+                        setAllowDetailAccess(true); // Allow access to DetailKaryawan
+                        setActivePage("DetailKaryawan"); // Automatically switch to DetailKaryawan
+                    }}
+                />
+            ),
+        },
         { title: "Tunjangan Karyawan", icon: "map:health", component: TunjanganKaryawan },
         {
             title: "Pinjaman Karyawan",
@@ -41,8 +51,9 @@ const Sidebar = () => {
     );
 
     const activeComponent =
-        activeMenu?.subMenus?.find((sub) => sub.title === activePage)?.component || activeMenu?.component;
-
+        activePage === "DetailKaryawan" && allowDetailAccess
+            ? DetailKaryawan
+            : activeMenu?.subMenus?.find((sub) => sub.title === activePage)?.component || activeMenu?.component;
 
     return (
         <div className="flex">
@@ -116,7 +127,7 @@ const Sidebar = () => {
                     ))}
                 </ul>
             </div>
-            <div className="py-5 pr-5 text-2xl font-semibold flex-1 bg-[#A996C5] ">
+            <div className="py-5 pr-5 text-2xl font-semibold flex-1 bg-[#A996C5]">
                 <div
                     className="bg-white rounded-2xl content ps-5 pt-5 pb-5 pr-4 overflow-y-hidden"
                     style={{ height: "calc(100vh - 40px)" }}

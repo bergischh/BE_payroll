@@ -93,22 +93,22 @@ export const fetchDataKaryawan = async () => {
 };
 
 // Fungsi untuk menambahkan data karyawan
-// export const addDataKaryawan = async (karyawanData) => {
-//   try {
-//     const token = Cookies.get("token"); // Ambil token dari Cookies
-//     console.log("Token:", token); // Debug token
-//     const response = await axios.post(`${apiUrl}api/karyawan/`, karyawanData, {
-//       headers: {
-//         Authorization: `Bearer ${token}`,
-//       },
-//     });
-//     console.log("API response data (karyawan added):", response.data);
-//     return response.data; // Kembalikan data response
-//   } catch (error) {
-//     console.error("Error adding karyawan:", error);
-//     throw error;
-//   }
-// };
+export const addDataKaryawan = async (karyawanData) => {
+  try {
+    const token = Cookies.get("token"); // Ambil token dari Cookies
+    console.log("Token:", token); // Debug token
+    const response = await axios.post(`${apiUrl}api/karyawan/`, karyawanData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    console.log("API response data (karyawan added):", response.data);
+    return response.data; // Kembalikan data response
+  } catch (error) {
+    console.error("Error adding karyawan:", error);
+    throw error;
+  }
+};
 
 
 
