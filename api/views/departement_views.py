@@ -154,23 +154,22 @@ class DepartmentDelete(APIView):
             })
         
         try:
-            user_id = decode_access_token(token)  
+            user_id = decode_access_token(token)
+            auth_user = get_object_or_404(User, id=user_id)  
         except exceptions.AuthenticationFailed:
             return Response({
                 "error": "Anda tidak memiliki akses."
             }, status=status.HTTP_401_UNAUTHORIZED)
 
-        user = get_object_or_404(User, id=user_id)
+        target_id = kwargs.get('id')
+        target_department = get_object_or_404(Departement, id=target_id)
 
-        id = kwargs.get('id')
-        department = get_object_or_404(Departement, id=id)
-
-        if user.role not in ['admin', 'manager']:
+        if auth_user.role not in ['admin', 'manager']:
             return Response({
                 "error": "Unauthorized. Only admin or manager can delete records."
             }, status=status.HTTP_403_FORBIDDEN)
 
-        department.delete()
+        target_department.delete()
         return Response({
             "message" : "Success delete data department!"
         }, status=status.HTTP_204_NO_CONTENT)

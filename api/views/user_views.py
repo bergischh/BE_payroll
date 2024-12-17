@@ -156,25 +156,24 @@ class UserDelete(APIView):
             })
         
         try:
-            user_id = decode_access_token(token)  
+            user_id = decode_access_token(token) 
+            auth_user = get_object_or_404(User, id=user_id) 
         except exceptions.AuthenticationFailed:
             return Response({
                 "error": "Anda tidak memiliki akses."
             }, status=status.HTTP_401_UNAUTHORIZED)
 
-        user = get_object_or_404(User, id=user_id)
+        target_id = kwargs.get('id')
+        target_user = get_object_or_404(User, id=target_id)
 
-        id = kwargs.get('id')
-        user = get_object_or_404(User, id=id)
-
-        if user.role not in ['admin', 'manager']:
+        if auth_user.role not in ['admin', 'manager']:
             return Response({
-                "error": "Invalid user role"
+                "error": "Unauthorized. Only admin or manager can delete records."
             }, status=status.HTTP_403_FORBIDDEN)
 
-        user.delete()
+        target_user.delete()
         return Response({
-            "message" : "Berhasil menghapus data"
+            "message" : "Success delete"
         }, status=status.HTTP_204_NO_CONTENT)
 
 class LoginView(APIView): 

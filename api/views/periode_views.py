@@ -160,28 +160,21 @@ class PeriodeDelete(APIView):
         
         try:
             user_id = decode_access_token(token)
+            auth_user = get_object_or_404(User, id=user_id)
         except exceptions.AuthenticationFailed as e:
             return Response({
                 "error": "Anda tidak memiliki akses."
             }, status=status.HTTP_401_UNAUTHORIZED)
 
-        user = get_object_or_404(User, id=user_id)
-        
-        if user is None:
-            return Response({
-                "error": "User tidak ditemukan"
-            }, status=status.HTTP_404_NOT_FOUND)
+        target_id = kwargs.get('id')
+        target_periode= get_object_or_404(PeriodeGaji, id=target_id)
 
-        id = kwargs.get('id')
-        periode= get_object_or_404(PeriodeGaji, id=id)
-
-        if user.role not in ['admin', 'manager']:
+        if auth_user.role not in ['admin', 'manager']:
             return Response({
                 "error": "Unauthorized. Only admin or manager can delete records."
             }, status=status.HTTP_403_FORBIDDEN)
     
-
-        periode.delete()
+        target_periode.delete()
         return Response({
             "message" : "Success delete data periode!"
         }, status=status.HTTP_204_NO_CONTENT)

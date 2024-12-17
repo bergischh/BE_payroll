@@ -162,31 +162,23 @@ class TransactionDelete(APIView):
         
        try:
             user_id = decode_access_token(token)
+            auth_user = get_object_or_404(User, id=user_id)
        except exceptions.AuthenticationFailed as e:
             return Response({
                 "error": "Anda tidak memiliki akses."
             }, status=status.HTTP_401_UNAUTHORIZED)
+           
+       target_id = kwargs.get('id')
+       target_transaction = get_object_or_404(Transaction, id=target_id)
        
-       user = get_object_or_404(User, id=user_id)
-
-       if not user:
-            return Response({'error': 'User not found'}, status=404)
-    
-       id = kwargs.get('id')
-       transaction = get_object_or_404(Transaction, id=id)
-       
-       if user.role in ['admin', 'manager']:
-             transaction = Transaction.objects.all()
-       elif user.role == 'karyawan':
-            transaction = Transaction.objects.filter(user=user)
-       else:
+       if auth_user.role not in ['admin', 'manager']:
             return Response({
-                "error": "Invalid user role"
+                "error": "Unauthorized. Only admin or manager can delete records."
             }, status=status.HTTP_403_FORBIDDEN)
        
-       transaction.delete()
+       target_transaction.delete()
        return Response({
-            "message" : "Berhasil menghapus data"
+            "message" : "Success delete data transaction!"
        }, status=status.HTTP_204_NO_CONTENT)
 
     

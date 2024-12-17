@@ -158,28 +158,22 @@ class TunjanganDelete(APIView):
         
         try:
             user_id = decode_access_token(token)
+            auth_user = get_object_or_404(User, id=user_id)
         except exceptions.AuthenticationFailed as e:
             return Response({
                 "error": "Anda tidak memiliki akses."
             }, status=status.HTTP_401_UNAUTHORIZED)
 
-        user = get_object_or_404(User, id=user_id)
-        
-        if user is None:
-            return Response({
-                "error": "User tidak ditemukan"
-            }, status=status.HTTP_404_NOT_FOUND)
+        target_id = kwargs.get('id')
+        target_allowance = get_object_or_404(Tunjangan, id=target_id)
 
-        tunjangan_id = kwargs.get('id')
-        allowance = get_object_or_404(Tunjangan, id=tunjangan_id)
-
-        if user.role in ['admin', 'manager']:
+        if auth_user.role in ['admin', 'manager']:
             return Response({
                 "error": "Invalid user role"
             }, status=status.HTTP_403_FORBIDDEN)
 
-        allowance.delete()
+        target_allowance.delete()
         return Response({
-            "message" : "Berhasil menghapus data"
+            "message" : "Success delete data allowance!"
         }, status=status.HTTP_204_NO_CONTENT)
     

@@ -197,28 +197,25 @@ class PinjamanDelete(APIView):
         
         try:
             user_id = decode_access_token(token)
+            auth_user = get_object_or_404(User, id=user_id)
         except exceptions.AuthenticationFailed as e:
             return Response({
                 "error": "Anda tidak memiliki akses."
             }, status=status.HTTP_401_UNAUTHORIZED)
 
-        user = get_object_or_404(User, id=user_id)
-    
-        if user is None:
-            return Response({"error": "User tidak ditemukan"}, status=status.HTTP_404_NOT_FOUND)
+        target_id = kwargs.get('id')
+        target_loan = get_object_or_404(Pinjaman, id=target_id)
 
-        id = kwargs.get('id')
-        loan = get_object_or_404(Pinjaman, id=id)
-
-        if user.role in ['admin', 'manager']:
-            pass
-        else:
-            return Response({"error": "Invalid user role"}, status=status.HTTP_403_FORBIDDEN)
-
-        loan.delete()
+        if auth_user.role in ['admin', 'manager']:
+           return Response({
+                "error": "Unauthorized. Only admin or manager can delete records."
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        target_loan.delete()
         return Response({
             "message" : "Success delete data loan!"
         }, status=status.HTTP_204_NO_CONTENT)
+     
 
 class PeminjamanApproval(APIView):
     def post(self, request, *args, **kwargs):

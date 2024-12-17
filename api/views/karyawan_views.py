@@ -156,28 +156,22 @@ class KaryawanDelete(APIView):
             })
         
         try:
-            user_id = decode_access_token(token)  
+            user_id = decode_access_token(token) 
+            auth_user = get_object_or_404(User, id=user_id)  
         except exceptions.AuthenticationFailed:
             return Response({
                 "error": "Anda tidak memiliki akses."
             }, status=status.HTTP_401_UNAUTHORIZED)
 
-        user = get_object_or_404(User, id=user_id)
+        target_id = kwargs.get('id')
+        target_employee = get_object_or_404(Karyawan, id=target_id)
 
-        if user.role is None:
-            return Response({
-                "error": "Unauthorized. Only admin or manager can delete records."
-            }, status=status.HTTP_404_NOT_FOUND)
-
-        id = kwargs.get('id')
-        employees = get_object_or_404(Karyawan, id=id)
-
-        if user.role not in ['admin', 'manager']:
+        if auth_user.role not in ['admin', 'manager']:
             return Response({
                 "error": "Unauthorized. Only admin or manager can delete records."
             }, status=status.HTTP_403_FORBIDDEN)            
 
-        employees.delete()
+        target_employee.delete()
         return Response({
             "message": "Success delete data employee!"
         }, status=status.HTTP_204_NO_CONTENT)

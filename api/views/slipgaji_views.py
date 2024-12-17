@@ -154,21 +154,19 @@ class SlipGajiDelete(APIView):
         
         try:
             user_id = decode_access_token(token)
+            auth_user = get_object_or_404(User, id=user_id)
         except exceptions.AuthenticationFailed as e:
             return Response({
                 "error": "Anda tidak memiliki akses."
             }, status=status.HTTP_401_UNAUTHORIZED)
 
-        user = get_object_or_404(User, id=user_id)
+        target_id = kwargs.get('id')
+        target_salarySlip = get_object_or_404(SlipGaji, id=target_id)
 
-        id = kwargs.get('id')
-        salarySlip = get_object_or_404(SlipGaji, id=id)
-
-        # Cek apakah user adalah admin atau manager
-        if user.role not in ['admin', 'manager']:
+        if auth_user.role not in ['admin', 'manager']:
             return Response({"error": "Unauthorized. Only admin or manager can delete records."}, status=status.HTTP_403_FORBIDDEN)
 
-        salarySlip.delete()
+        target_salarySlip.delete()
         return Response({
             "message" : "Success delete data salary slip!"
         }, status=status.HTTP_204_NO_CONTENT)

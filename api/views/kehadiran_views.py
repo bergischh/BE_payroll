@@ -180,25 +180,21 @@ class KehadiranDelete(APIView):
         
         try:
             user_id = decode_access_token(token)
+            auth_user = get_object_or_404(User, id=user_id)
         except exceptions.AuthenticationFailed as e:
             return Response({
                 "error": "Anda tidak memiliki akses."
             }, status=status.HTTP_401_UNAUTHORIZED)
 
-        user = get_object_or_404(User, id=user_id)
-    
-        if user is None:
-            return Response({"error": "User tidak ditemukan"}, status=status.HTTP_404_NOT_FOUND)
+        target_id = kwargs.get('id')
+        target_attendance = get_object_or_404(Kehadiran, id=target_id)
 
-        id = kwargs.get('id')
-        attendance = get_object_or_404(Kehadiran, id=id)
+        if auth_user.role not in ['admin', 'manager']:
+            return Response({
+                "error": "Unauthorized. Only admin or manager can delete records."
+            }, status=status.HTTP_403_FORBIDDEN) 
 
-        if user.role in ['admin', 'manager']:
-            pass
-        else:
-            return Response({"error": "Invalid user role"}, status=status.HTTP_403_FORBIDDEN)
-
-        attendance.delete()
+        target_attendance.delete()
         return Response({
             "message" : "Success delete data attendance!"
         }, status=status.HTTP_204_NO_CONTENT)
