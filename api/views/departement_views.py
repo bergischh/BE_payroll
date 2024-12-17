@@ -162,15 +162,15 @@ class DepartmentDelete(APIView):
 
         user = get_object_or_404(User, id=user_id)
 
-        department_id = kwargs.get('id')
-        departments = get_object_or_404(Departement, id=department_id)
+        id = kwargs.get('id')
+        department = get_object_or_404(Departement, id=id)
 
         if user.role not in ['admin', 'manager']:
             return Response({
-                "error": "Invalid user role"
+                "error": "Unauthorized. Only admin or manager can delete records."
             }, status=status.HTTP_403_FORBIDDEN)
 
-        departments.delete()
+        department.delete()
         return Response({
-            "message" : "Berhasil menghapus data"
+            "message" : "Success delete data department!"
         }, status=status.HTTP_204_NO_CONTENT)

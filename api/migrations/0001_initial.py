@@ -123,7 +123,7 @@ class Migration(migrations.Migration):
                 ('alamat', models.CharField(max_length=100)),
                 ('no_telephone', models.CharField(max_length=12, validators=[django.core.validators.MinLengthValidator(10), django.core.validators.MaxLengthValidator(12), django.core.validators.RegexValidator(code='invalid_number', message='Nomor telepon harus terdiri dari 10 hingga 12 angka.', regex='^\\d{10,12}$')])),
                 ('jabatan', models.CharField(blank=True, max_length=100, null=True)),
-                ('foto', models.ImageField(blank=True, null=True, upload_to=api.models.karyawan_models.user_directory_path)),
+                ('foto', models.ImageField(blank=True, null=True, upload_to=api.models.karyawan_models.foto_karyawan_directory_path)),
                 ('department', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='karyawan_profiles', to='api.departement')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='karyawan_profiles', to=settings.AUTH_USER_MODEL)),
             ],

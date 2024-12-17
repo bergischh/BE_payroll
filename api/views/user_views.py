@@ -121,19 +121,14 @@ class UpdateUserView(APIView):
     
         user = get_object_or_404(User, id=user_id)
 
-        if not user.is_staff:  
+
+        if user.role != "admin":
             return Response({'error': 'You do not have permission to perform this action.'}, status=status.HTTP_403_FORBIDDEN)
 
-        user_to_update = get_object_or_404(User, id=kwargs['id'])
-
-        if 'username' in request.data:
-            del request.data['username']
-        if 'password' in request.data:
-            del request.data['password']
-        if 'role' in request.data:
-            del request.data['role']
+        id = kwargs.get('id')
+        users = get_object_or_404(User, id=id)
   
-        serializer = UsersSerializer(user_to_update, data=request.data, partial=True)  
+        serializer = UsersSerializer(users, data=request.data, partial=True)  
         if serializer.is_valid():
             serializer.save()
             return Response({

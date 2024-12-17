@@ -191,16 +191,16 @@ class KehadiranDelete(APIView):
             return Response({"error": "User tidak ditemukan"}, status=status.HTTP_404_NOT_FOUND)
 
         id = kwargs.get('id')
-        kehadiran = get_object_or_404(Kehadiran, id=id)
+        attendance = get_object_or_404(Kehadiran, id=id)
 
         if user.role in ['admin', 'manager']:
             pass
         else:
             return Response({"error": "Invalid user role"}, status=status.HTTP_403_FORBIDDEN)
 
-        kehadiran.delete()
+        attendance.delete()
         return Response({
-            "message" : "Berhasil menghapus data"
+            "message" : "Success delete data attendance!"
         }, status=status.HTTP_204_NO_CONTENT)
      
 

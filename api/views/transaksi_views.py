@@ -174,7 +174,6 @@ class TransactionDelete(APIView):
     
        id = kwargs.get('id')
        transaction = get_object_or_404(Transaction, id=id)
-
        
        if user.role in ['admin', 'manager']:
              transaction = Transaction.objects.all()

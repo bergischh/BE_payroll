@@ -161,14 +161,14 @@ class SlipGajiDelete(APIView):
 
         user = get_object_or_404(User, id=user_id)
 
+        id = kwargs.get('id')
+        salarySlip = get_object_or_404(SlipGaji, id=id)
+
         # Cek apakah user adalah admin atau manager
         if user.role not in ['admin', 'manager']:
             return Response({"error": "Unauthorized. Only admin or manager can delete records."}, status=status.HTTP_403_FORBIDDEN)
 
-        slipgaji_id = kwargs.get('id')
-        slipgaji = get_object_or_404(SlipGaji, id=slipgaji_id)
-
-        slipgaji.delete()
+        salarySlip.delete()
         return Response({
-            "message" : "Berhasil menghapus data"
+            "message" : "Success delete data salary slip!"
         }, status=status.HTTP_204_NO_CONTENT)

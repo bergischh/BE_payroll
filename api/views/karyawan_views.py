@@ -141,8 +141,7 @@ class KaryawanUpdate(APIView):
 
     
 class KaryawanDelete(APIView):
-    def put(self, request, *args, **kwargs):
-
+    def delete(self, request, *args, **kwargs):
         auth_header = request.headers.get('Authorization')
         token = None
 
@@ -164,26 +163,21 @@ class KaryawanDelete(APIView):
             }, status=status.HTTP_401_UNAUTHORIZED)
 
         user = get_object_or_404(User, id=user_id)
+
         if user.role is None:
             return Response({
                 "error": "Unauthorized. Only admin or manager can delete records."
             }, status=status.HTTP_404_NOT_FOUND)
 
-        karyawan_id = kwargs.get('id')
-        employees = get_object_or_404(Karyawan, id=karyawan_id)
+        id = kwargs.get('id')
+        employees = get_object_or_404(Karyawan, id=id)
 
         if user.role not in ['admin', 'manager']:
             return Response({
                 "error": "Unauthorized. Only admin or manager can delete records."
             }, status=status.HTTP_403_FORBIDDEN)            
 
-        serializer = KaryawanSerializer(employees, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({
-                "message" : "Berhasil update data",
-                "data" : serializer.data
-            }, status=status.HTTP_200_OK)
+        employees.delete()
         return Response({
-            "errors" : serializer.errors
-        }, status=status.HTTP_400_BAD_REQUEST)
+            "message": "Success delete data employee!"
+        }, status=status.HTTP_204_NO_CONTENT)

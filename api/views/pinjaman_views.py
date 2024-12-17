@@ -208,16 +208,16 @@ class PinjamanDelete(APIView):
             return Response({"error": "User tidak ditemukan"}, status=status.HTTP_404_NOT_FOUND)
 
         id = kwargs.get('id')
-        pinjaman = get_object_or_404(Pinjaman, id=id)
+        loan = get_object_or_404(Pinjaman, id=id)
 
         if user.role in ['admin', 'manager']:
             pass
         else:
             return Response({"error": "Invalid user role"}, status=status.HTTP_403_FORBIDDEN)
 
-        pinjaman.delete()
+        loan.delete()
         return Response({
-            "message" : "Berhasil menghapus data"
+            "message" : "Success delete data loan!"
         }, status=status.HTTP_204_NO_CONTENT)
 
 class PeminjamanApproval(APIView):

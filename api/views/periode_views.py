@@ -177,13 +177,13 @@ class PeriodeDelete(APIView):
 
         if user.role not in ['admin', 'manager']:
             return Response({
-                "error": "Invalid user role"
+                "error": "Unauthorized. Only admin or manager can delete records."
             }, status=status.HTTP_403_FORBIDDEN)
     
 
         periode.delete()
         return Response({
-            "message" : "Berhasil menghapus data"
+            "message" : "Success delete data periode!"
         }, status=status.HTTP_204_NO_CONTENT)
 
     

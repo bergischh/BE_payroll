@@ -6,10 +6,10 @@ from .departement_models import Departement
 import os
 
 
-def user_directory_path(instance, filename):
+def foto_karyawan_directory_path(instance, filename):
     timestamp = timezone.now().strftime('%Y%m%d_%H%M%S')  
     ext = filename.split('.')[-1]  
-    new_filename = f"{timestamp}.{ext}"  
+    new_filename = f"{instance.nama_karyawan.replace(' ', '_')}_photo_{timestamp}.{ext}" 
     return os.path.join('foto_karyawan/', new_filename)
 
 class Karyawan(models.Model):  
@@ -44,7 +44,7 @@ class Karyawan(models.Model):
         ],
     ) 
     jabatan = models.CharField(max_length=100, null=True, blank=True)
-    foto = models.ImageField(upload_to=user_directory_path, null=True, blank=True)
+    foto = models.ImageField(upload_to=foto_karyawan_directory_path, null=True, blank=True)
     
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='karyawan_profiles')
 

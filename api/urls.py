@@ -29,7 +29,7 @@ urlpatterns = [
     path('login/', LoginView.as_view(), name='login-users'),  
     path('update-account/<int:id>/', UpdateUserView.as_view(), name='update-users'),  
     path('user/', UserAPIView.as_view(), name='users'),  
-    path('delete-user/', UserDelete.as_view(), name='user-delete'),  
+    path('delete-user/<int:id>/', UserDelete.as_view(), name='user-delete'),  
     path('refresh/', RefreshAPIView.as_view(), name='refresh-token'),
     path('logout/', LogoutView.as_view(), name='logout-users'),
 
@@ -50,8 +50,8 @@ urlpatterns = [
     path('create-calon-karyawan/', CalonKaryawanCreate.as_view(), name='calon-karyawan-create'), 
     path('update-calon-karyawan/<int:id>/', CalonKaryawanUpdate.as_view(), name='calon-karyawan-update'),
     path('delete-calon-karyawan/<int:id>/', CalonKaryawanDelete.as_view(), name='calon-karyawan-delete'), 
-    path('calon-karyawan/accept/', CalonKaryawanAccept.as_view(), name='calon-karyawan-accept'), 
-    path('calon-karyawan/reject/', CalonKaryawanReject.as_view(), name='calon-karyawan-reject'), 
+    path('calon-karyawan/accept/<int:id>/', CalonKaryawanAccept.as_view(), name='calon-karyawan-accept'), 
+    path('calon-karyawan/reject/<int:id>/', CalonKaryawanReject.as_view(), name='calon-karyawan-reject'), 
  
     # tunjangan karyawan
     path('tunjangan/', TunjanganView.as_view(), name='tunjangan'),

@@ -3,11 +3,13 @@ from rest_framework.response import Response
 from rest_framework import status, exceptions
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.shortcuts import get_object_or_404
+from django.core.files.storage import default_storage
 from ..models.calonkaryawan_models import CalonKaryawan
 from rest_framework.permissions import IsAuthenticated
 from ..models import User, Karyawan
 from ..serializers import CalonKaryawanSerializer
 from ..authentication import decode_access_token
+from ..models.karyawan_models import foto_karyawan_directory_path
 
 class CalonKaryawanView(APIView):
     def get(self, request):
@@ -41,16 +43,16 @@ class CalonKaryawanCreate(APIView):
        
        user = get_object_or_404(User, id=user_id) 
 
-       if not user:
-            return Response({'error': 'User not found'}, status=404)
-       
        if user.role != 'calon_karyawan' :
          return Response({
                 "error": "Invalid user role"
          }, status=status.HTTP_403_FORBIDDEN)
-    
+       
+         # Tambahkan `user` langsung ke data sebelum validasi
+       data = request.data.dict()  # Ubah ke dict agar dapat dimodifikasi
+       data['user'] = user.id  # Masukkan ID user ke dalam data
 
-       serializer = CalonKaryawanSerializer(data=request.data)
+       serializer = CalonKaryawanSerializer(data=data)
        if serializer.is_valid():
             serializer.save()
             return Response({
@@ -90,7 +92,7 @@ class CalonKaryawanDelete(APIView):
     
 
 class CalonKaryawanAccept(APIView):
-    def post(self, request):
+    def post(self, request, id):
         # Mengambil token dari header Authorization
         auth_header = request.headers.get('Authorization')
         token = None
@@ -115,9 +117,22 @@ class CalonKaryawanAccept(APIView):
 
         user = get_object_or_404(User, id=user_id)  # Mendapatkan user berdasarkan user_id dari token
 
-        # Mengambil ID calon karyawan dari request data
-        id = request.data.get('id')
+        if user.role not in ['admin', 'manager']:
+            return Response({
+                "error": "Anda tidak memiliki izin untuk mengakses endpoint ini."
+            }, status=status.HTTP_403_FORBIDDEN)
+
+        # Mengambil ID calon karyawan dari url
         candidate = get_object_or_404(CalonKaryawan, id=id)
+
+          # Memindahkan foto calon karyawan ke folder 'foto_karyawan'
+        if candidate.photo:
+            # Mendapatkan path file foto yang lama
+            old_photo_path = candidate.photo.path
+            # Menyimpan foto dengan path baru di folder foto_karyawan
+            new_photo_path = default_storage.save(foto_karyawan_directory_path(candidate, candidate.photo.name), candidate.photo)
+            # Mengupdate field foto di calon karyawan
+            candidate.photo.name = new_photo_path
 
         # Mengupdate status wawancara calon karyawan
         candidate.status_wawancara = CalonKaryawan.StatusWawancara.diterima
@@ -156,8 +171,36 @@ class CalonKaryawanAccept(APIView):
         }, status=status.HTTP_201_CREATED)
     
 class CalonKaryawanReject(APIView):
-    def post(self, request, *args, **kwargs):
-        id = kwargs.get('id')  
+    def post(self, request, id):
+         # Mengambil token dari header Authorization
+        auth_header = request.headers.get('Authorization')
+        token = None
+
+        if auth_header and auth_header.startswith('Bearer '):
+            token = auth_header.split(' ')[1]  
+        else:
+            token = request.COOKIES.get('accessToken')  
+
+        # Memastikan token ada
+        if not token:
+            return Response({
+                "error": "Token tidak ada, tolong masukkan token"
+            }, status=status.HTTP_401_UNAUTHORIZED)
+        
+        try:
+            user_id = decode_access_token(token)  # Decode token untuk mendapatkan user_id
+        except exceptions.AuthenticationFailed:
+            return Response({
+                "error": "Anda tidak memiliki akses."
+            }, status=status.HTTP_401_UNAUTHORIZED)
+
+        user = get_object_or_404(User, id=user_id)  # Mendapatkan user berdasarkan user_id dari token
+
+        if user.role not in ['admin', 'manager']:
+            return Response({
+                "error": "Anda tidak memiliki izin untuk mengakses endpoint ini."
+            }, status=status.HTTP_403_FORBIDDEN)
+        
         candidate = get_object_or_404(CalonKaryawan, id=id)  
 
         candidate.status_wawancara = CalonKaryawan.StatusWawancara.tidak_diterima

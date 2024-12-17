@@ -172,13 +172,13 @@ class LaporanGajiDelete(APIView):
 
         user = get_object_or_404(User, id=user_id)
 
+        id = kwargs.get('id')
+        report = get_object_or_404(LaporanGaji, id=id)
+
         if user.role not in ['admin', 'manager']:
             return Response({"error": "Unauthorized. Only admin or manager can delete records."}, status=status.HTTP_403_FORBIDDEN)
 
-        laporan_id = kwargs.get('id')
-        report = get_object_or_404(LaporanGaji, id=laporan_id)
-
         report.delete()
         return Response({
-            "message": "Berhasil menghapus data"
+            "message": "Success detelet data salary report!"
         }, status=status.HTTP_204_NO_CONTENT)
