@@ -160,13 +160,9 @@ class CalonKaryawanAccept(APIView):
             # Mengupdate field foto di calon karyawan
             candidate.photo.name = new_photo_path
 
-        # Mengupdate status wawancara calon karyawan
-        candidate.status_wawancara = CalonKaryawan.StatusWawancara.diterima
-        candidate.save()
-
         # Mengupdate role user menjadi 'karyawan'
-        user.role = 'karyawan'
-        user.save()
+        candidate.user.role = 'karyawan'
+        candidate.user.save()
 
         # Mengimpor data ke tabel Karyawan
         karyawan = Karyawan.objects.create(
@@ -182,16 +178,20 @@ class CalonKaryawanAccept(APIView):
             alamat=candidate.alamat,
             no_telephone=candidate.no_telephone,
             jabatan=None, 
-            user=user, 
             department=None,
+            user=candidate.user, 
             foto = candidate.photo
         )
+
+         # Mengupdate status wawancara calon karyawan
+        candidate.status_wawancara = CalonKaryawan.StatusWawancara.diterima
+        candidate.save()
 
         return Response({
             "message": "Karyawan berhasil diterima",
             "data": {
                 "candidate": CalonKaryawanSerializer(candidate).data,
-                "user_id": user.id,
+                "user_id": candidate.user.id,
                 "karyawan_id": karyawan.id
             }
         }, status=status.HTTP_201_CREATED)

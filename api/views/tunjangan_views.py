@@ -21,10 +21,10 @@ class TunjanganView(APIView):
             token = request.COOKIES.get('accessToken')  
 
         if not token:
-             return Response({
+            return Response({
                 "error": "Token tidak ada, tolong masukkan token"
             })
-        
+
         try:
             user_id = decode_access_token(token)
         except exceptions.AuthenticationFailed as e:
@@ -35,11 +35,12 @@ class TunjanganView(APIView):
         user = get_object_or_404(User, id=user_id)
 
         if user.role in ['admin', 'manager']:
-            allowance = Tunjangan.objects.all()
+            # Fetch all Tunjangan with associated Karyawan using select_related
+            allowance = Tunjangan.objects.all().select_related('karyawan')  # Optimized query with related Karyawan
         elif user.role == 'karyawan':
             try:
                 karyawan = user.karyawan_profiles
-                allowance = Tunjangan.objects.filter(laporanpenggajian__karyawan=karyawan).distinct()
+                allowance = Tunjangan.objects.filter(karyawan=karyawan).select_related('karyawan').distinct()
             except Karyawan.DoesNotExist:
                 return Response({
                     "error": "Karyawan tidak ditemukan."
@@ -51,6 +52,8 @@ class TunjanganView(APIView):
 
         serializer = TunjanganSerializer(allowance, many=True)
         return Response(serializer.data)
+
+
 
     
 class TunjanganCreate(APIView):

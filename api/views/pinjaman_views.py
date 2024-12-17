@@ -35,18 +35,21 @@ class PinjamanView(APIView):
             }, status=status.HTTP_401_UNAUTHORIZED)
 
         user = get_object_or_404(User, id=user_id)
-        if not user:
-            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
-
+    
         if user.role in ['admin', 'manager']:
-            loan = Pinjaman.objects.all()
+            loan = Pinjaman.objects.all().select_related('karyawan')
         elif user.role == 'karyawan':
-            karyawan = Karyawan.objects.filter(user=user).first()
-            if not karyawan:
-                    return Response({'error': 'Karyawan data not found for this user'}, status=404)
-            loan = Pinjaman.objects.filter(karyawan=karyawan)
+            try:
+                karyawan = user.karyawan_profiles
+                loan = Pinjaman.objects.filter(karyawan=karyawan).select_related('karyawan').distinct()
+            except Karyawan.DoesNotExist:
+                return Response({
+                    "error": "Karyawan tidak ditemukan."
+                }, status=status.HTTP_404_NOT_FOUND)
         else:
-            return Response({"error": "Invalid user role"}, status=status.HTTP_403_FORBIDDEN)
+            return Response({
+                "error": "Invalid user role"
+            }, status=status.HTTP_403_FORBIDDEN)
         
         serializer = PinjamanSerializer(loan, many = True)
         return Response(serializer.data)
@@ -136,48 +139,6 @@ class PinjamanUpdate(APIView):
         return Response({
             "errors" : serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
-   
-class PinjamanDelete(APIView):
-    def delete(self, request, *args, **kwargs):
-        auth_header = request.headers.get('Authorization')
-        token = None
-
-        if auth_header and auth_header.startswith('Bearer '):
-            token = auth_header.split(' ')[1]  
-        else:
-            token = request.COOKIES.get('accessToken')  
-
-        if not token:
-             return Response({
-                "error": "Token tidak ada, tolong masukkan token"
-            })
-        
-        try:
-            user_id = decode_access_token(token)
-        except exceptions.AuthenticationFailed as e:
-            return Response({
-                "error": "Anda tidak memiliki akses."
-            }, status=status.HTTP_401_UNAUTHORIZED)
-
-        user = get_object_or_404(User, id=user_id)
-        
-        if user is None:
-            return Response({
-                "error": "User tidak ditemukan"
-            }, status=status.HTTP_404_NOT_FOUND)
-
-        loan_id = kwargs.get('id')
-        loan = get_object_or_404(Pinjaman, id=loan_id)
-
-        if user.role in ['admin', 'manager']:
-            return Response({
-                "error": "Invalid user role"
-            }, status=status.HTTP_403_FORBIDDEN)
-    
-        loan.delete()
-        return Response({
-            "message" : "Berhasil menghapus data"
-        }, status=status.HTTP_204_NO_CONTENT)
     
 
 class PinjamanDelete(APIView):

@@ -7,7 +7,7 @@ from .user_models import User
 def user_directory_path(instance, filename):
     timestamp = timezone.now().strftime('%Y%m%d_%H%M%S') 
     ext = filename.split('.')[-1]  
-    new_filename = f"{timestamp}.{ext}"  
+    new_filename = f"{instance.nama_karyawan.replace(' ', '_')}_calon_karyawan_{timestamp}.{ext}" 
     return os.path.join('images_profile/', new_filename)
 
 def ktp_upload_path(instance, filename):
@@ -65,18 +65,9 @@ class CalonKaryawan(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='calonKaryawan_profiles')
 
     def save(self, *args, **kwargs):
-        if self.pk: 
-            old_instance = CalonKaryawan.objects.get(pk=self.pk)
-            if old_instance.photo and old_instance.photo != self.photo:
-                if os.path.isfile(old_instance.photo.path):
-                    os.remove(old_instance.photo.path) 
-            if old_instance.ktp and old_instance.ktp != self.ktp:
-                if os.path.isfile(old_instance.ktp.path):
-                    os.remove(old_instance.ktp.path)  
-            if old_instance.ijazah and old_instance.ijazah != self.ijazah:
-                if os.path.isfile(old_instance.ijazah.path):
-                    os.remove(old_instance.ijazah.path) 
-
+        """
+        Simpan tanpa menghapus file yang lama.
+        """
         super().save(*args, **kwargs) 
 
     def delete(self, *args, **kwargs):
@@ -90,5 +81,6 @@ class CalonKaryawan(models.Model):
             if os.path.isfile(self.ijazah.path):
                 os.remove(self.ijazah.path)
         super().delete(*args, **kwargs)  
+
     def __str__(self):
         return self.nama_karyawan

@@ -113,22 +113,21 @@ class KaryawanUpdate(APIView):
           
         try:
             user_id = decode_access_token(token)
+            auth_user = get_object_or_404(User, id=user_id) 
         except exceptions.AuthenticationFailed:
             return Response({
                 "error": "Anda tidak memiliki akses."
             }, status=status.HTTP_401_UNAUTHORIZED)
        
-        user = get_object_or_404(User, id=user_id) 
-        
-        karyawan_id = kwargs.get('id')
-        karyawan = get_object_or_404(Karyawan, id=karyawan_id)
+        target_id = kwargs.get('id')
+        target_karyawan = get_object_or_404(Karyawan, id=target_id)
 
-        if user.role != 'admin' and karyawan.user_id != user.id:
+        if auth_user.role != 'admin' and target_karyawan.user_id != auth_user.id:
             return Response({
                 "error": "Anda tidak memiliki izin untuk mengedit data ini."
             }, status=status.HTTP_403_FORBIDDEN)
         
-        serializer = KaryawanSerializer(karyawan, data=request.data, partial=True)
+        serializer = KaryawanSerializer(target_karyawan, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response({

@@ -31,7 +31,7 @@ class KaryawanSerializer(serializers.ModelSerializer):
     class Meta:
         model = Karyawan
         fields = '__all__'
-        read_only_fields = ['user']  # Jangan izinkan user_id diisi secara manual
+        # read_only_fields = ['user']  # Jangan izinkan user_id diisi secara manual
 
 class DepartementSerializer(serializers.ModelSerializer):
     class Meta: 
@@ -44,14 +44,18 @@ class CalonKaryawanSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class TunjanganSerializer(serializers.ModelSerializer):
+    karyawan_nama = serializers.CharField(source='karyawan.nama_karyawan', default='')
+    karyawan_jabatan = serializers.CharField(source='karyawan.jabatan', default='')
     class Meta:
         model = Tunjangan
-        fields = '__all__'
+        fields = ['id', 'tunjangan_makan', 'tunjangan_kesehatan', 'tunjangan_jabatan', 'THR', 'bonus', 'karyawan_nama', 'karyawan_jabatan']
 
 class PinjamanSerializer(serializers.ModelSerializer):
+    karyawan_nik = serializers.CharField(source='karyawan.nik', default='')
+    karyawan_nama = serializers.CharField(source='karyawan.nama_karyawan', default='')
     class Meta:
         model = Pinjaman
-        fields = '__all__'
+        fields = ['id', 'jumlah_pinjaman', 'tanggal_pinjaman', 'tenggat_pinjaman', 'status_pembayaran', 'karyawan_nik', 'karyawan_nama', 'is_approve']
 
 class KehadiranSerializer(serializers.ModelSerializer):
     karyawan = serializers.SerializerMethodField()
