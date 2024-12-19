@@ -14,7 +14,7 @@ from ..serializers import KaryawanSerializer
 
 
 class KaryawanViews(APIView):
-    def get(self, request):
+    def get(self, request, id=None):
         auth_header = request.headers.get('Authorization')
         token = None
 
@@ -24,7 +24,7 @@ class KaryawanViews(APIView):
             token = request.COOKIES.get('accessToken')  
 
         if not token:
-             return Response({
+            return Response({
                 "error": "Token tidak ada, tolong masukkan token"
             })
         
@@ -37,17 +37,38 @@ class KaryawanViews(APIView):
 
         user = get_object_or_404(User, id=user_id)
 
-        if user.role in ['admin', 'manager']:
-            karyawan = Karyawan.objects.all()
-        elif user.role == 'karyawan':
-            karyawan = Karyawan.objects.filter(user=user)
-        else:
-            return Response({
-                "error": "Invalid user role"
-            }, status=status.HTTP_403_FORBIDDEN)
+        if id:
+            # Jika id diberikan, ambil data karyawan berdasarkan id
+            try:
+                if user.role in ['admin', 'manager']:
+                    karyawan = Karyawan.objects.get(id=id)
+                elif user.role == 'karyawan':
+                    karyawan = Karyawan.objects.get(id=id, user=user)
+                else:
+                    return Response({
+                        "error": "Invalid user role"
+                    }, status=status.HTTP_403_FORBIDDEN)
+            except Karyawan.DoesNotExist:
+                return Response({
+                    "error": "Karyawan tidak ditemukan"
+                }, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = KaryawanSerializer(karyawan, many=True)
-        return Response(serializer.data)
+            serializer = KaryawanSerializer(karyawan)
+            return Response(serializer.data)
+        else:
+            # Jika id tidak diberikan, ambil semua data karyawan
+            if user.role in ['admin', 'manager']:
+                karyawan = Karyawan.objects.all()
+            elif user.role == 'karyawan':
+                karyawan = Karyawan.objects.filter(user=user)
+            else:
+                return Response({
+                    "error": "Invalid user role"
+                }, status=status.HTTP_403_FORBIDDEN)
+
+            serializer = KaryawanSerializer(karyawan, many=True)
+            return Response(serializer.data)
+
 
     
 class KaryawanCreate(APIView):

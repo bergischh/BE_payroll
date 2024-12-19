@@ -34,7 +34,8 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='logout-users'),
 
     # karyawan
-    path('karyawan/', KaryawanViews.as_view(), name='karyawna'),
+    path('karyawan/', KaryawanViews.as_view(), name='karyawan'),
+    path('karyawan/<int:id>/', KaryawanViews.as_view(), name='karyawan'),
     path('create-karyawan/', KaryawanCreate.as_view(), name='karyawan-create'), 
     path('update-karyawan/<int:id>/', KaryawanUpdate.as_view(), name='karyawan-update'), 
     path('delete-karyawan/<int:id>/', KaryawanDelete.as_view(), name='karyawan-delete'), 
@@ -64,7 +65,8 @@ urlpatterns = [
     path('create-pinjaman/', PinjamanCreate.as_view(), name='pinjaman-create'), 
     path('update-pinjaman/<int:id>/', PinjamanUpdate.as_view(), name='pinjaman-update'),
     path('delete-pinjaman/<int:id>/', PinjamanDelete.as_view(), name='pinjaman-delete'), 
-    path('approve-pinjaman/<int:id>/', PeminjamanApproval.as_view(), name='pinjaman-approve'), 
+    path('approve-pinjaman/<int:id>/<str:action>/', PeminjamanApproval.as_view(), name='approve-reject-pinjaman'),
+ 
 
     # kehadiran karyawan
     path('kehadiran/', KehadiranView.as_view(), name='kehadiran'),

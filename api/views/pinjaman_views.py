@@ -37,7 +37,7 @@ class PinjamanView(APIView):
         user = get_object_or_404(User, id=user_id)
     
         if user.role in ['admin', 'manager']:
-            loan = Pinjaman.objects.all().select_related('karyawan')
+            loan = Pinjaman.objects.filter(is_approve=True).select_related('karyawan')
         elif user.role == 'karyawan':
             try:
                 karyawan = user.karyawan_profiles
@@ -208,16 +208,19 @@ class PeminjamanApproval(APIView):
             }, status=status.HTTP_403_FORBIDDEN)
 
         id = kwargs.get('id')
-        action = request.data.get('action') 
+        action = kwargs.get('action')
 
         pinjaman = get_object_or_404(Pinjaman, id=id)
 
         if action == 'approve':
             pinjaman.is_approve = True
             pinjaman.tanggal_pinjaman = date.today()  # Set tanggal_pinjaman saat ini
-            # Izinkan admin mengatur tenggat_pinjaman jika disediakan dalam request
-            if 'tenggat_pinjaman' in request.data:
-                pinjaman.tenggat_pinjaman = request.data['tenggat_pinjaman']
+            # Jika 'tenggat_pinjaman' ada dalam request data, update juga
+            tenggat_pinjaman = request.data.get('tenggat_pinjaman')
+            if tenggat_pinjaman:
+                pinjaman.tenggat_pinjaman = tenggat_pinjaman
+            else:
+                return Response({"error": "Tenggat pinjaman harus diberikan"}, status=status.HTTP_400_BAD_REQUEST)
         elif action == 'reject':
             pinjaman.is_approve = False
         else:
