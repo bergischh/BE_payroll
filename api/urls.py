@@ -2,7 +2,7 @@ from django.urls import path
 
 
 from .views.user_views import RegisterView, LoginView, UserAPIView, RefreshAPIView, LogoutView, UpdateUserView, UserDelete
-from .views.karyawan_views import KaryawanViews, KaryawanCreate, KaryawanUpdate, KaryawanDelete
+from .views.karyawan_views import KaryawanViews, KaryawanCreate, KaryawanUpdate, KaryawanDelete, KaryawanViewsId
 from .views.departement_views import DepartementView, DepartementCreate, DepartmentUpdate, DepartmentDelete
 from .views.calonkaryawan_views import CalonKaryawanView, CalonKaryawanCreate, CalonKaryawanUpdate, CalonKaryawanDelete, CalonKaryawanAccept, CalonKaryawanReject
 from .views.tunjangan_views import TunjanganView, TunjanganCreate, TunjanganUpdate, TunjanganDelete
@@ -35,7 +35,7 @@ urlpatterns = [
 
     # karyawan
     path('karyawan/', KaryawanViews.as_view(), name='karyawan'),
-    path('karyawan/<int:id>/', KaryawanViews.as_view(), name='karyawan'),
+    path('karyawan/<int:id>/', KaryawanViewsId.as_view(), name='karyawan'),
     path('create-karyawan/', KaryawanCreate.as_view(), name='karyawan-create'), 
     path('update-karyawan/<int:id>/', KaryawanUpdate.as_view(), name='karyawan-update'), 
     path('delete-karyawan/<int:id>/', KaryawanDelete.as_view(), name='karyawan-delete'), 

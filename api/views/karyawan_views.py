@@ -14,7 +14,7 @@ from ..serializers import KaryawanSerializer
 
 
 class KaryawanViews(APIView):
-    def get(self, request, id=None):
+    def get(self, request):
         auth_header = request.headers.get('Authorization')
         token = None
 
@@ -24,7 +24,7 @@ class KaryawanViews(APIView):
             token = request.COOKIES.get('accessToken')  
 
         if not token:
-            return Response({
+             return Response({
                 "error": "Token tidak ada, tolong masukkan token"
             })
         
@@ -37,38 +37,59 @@ class KaryawanViews(APIView):
 
         user = get_object_or_404(User, id=user_id)
 
-        if id:
-            # Jika id diberikan, ambil data karyawan berdasarkan id
-            try:
-                if user.role in ['admin', 'manager']:
-                    karyawan = Karyawan.objects.get(id=id)
-                elif user.role == 'karyawan':
-                    karyawan = Karyawan.objects.get(id=id, user=user)
-                else:
-                    return Response({
-                        "error": "Invalid user role"
-                    }, status=status.HTTP_403_FORBIDDEN)
-            except Karyawan.DoesNotExist:
-                return Response({
-                    "error": "Karyawan tidak ditemukan"
-                }, status=status.HTTP_404_NOT_FOUND)
-
-            serializer = KaryawanSerializer(karyawan)
-            return Response(serializer.data)
+        if user.role in ['admin', 'manager']:
+            karyawan = Karyawan.objects.all()
+        elif user.role == 'karyawan':
+            karyawan = Karyawan.objects.filter(user=user)
         else:
-            # Jika id tidak diberikan, ambil semua data karyawan
+            return Response({
+                "error": "Invalid user role"
+            }, status=status.HTTP_403_FORBIDDEN)
+
+        serializer = KaryawanSerializer(karyawan, many=True)
+        return Response(serializer.data)
+    
+
+class KaryawanViewsId(APIView):
+    def get(self, request, id):
+        auth_header = request.headers.get('Authorization')
+        token = None
+
+        if auth_header and auth_header.startswith('Bearer '):
+            token = auth_header.split(' ')[1]
+        else:
+            token = request.COOKIES.get('accessToken')
+
+        if not token:
+            return Response({
+                "error": "Token tidak ada, tolong masukkan token"
+            })
+
+        try:
+            user_id = decode_access_token(token)
+        except exceptions.AuthenticationFailed:
+            return Response({
+                "error": "Anda tidak memiliki akses."
+            }, status=status.HTTP_401_UNAUTHORIZED)
+
+        user = get_object_or_404(User, id=user_id)
+
+        try:
             if user.role in ['admin', 'manager']:
-                karyawan = Karyawan.objects.all()
+                karyawan = Karyawan.objects.get(id=id)
             elif user.role == 'karyawan':
-                karyawan = Karyawan.objects.filter(user=user)
+                karyawan = Karyawan.objects.get(id=id, user=user)
             else:
                 return Response({
                     "error": "Invalid user role"
                 }, status=status.HTTP_403_FORBIDDEN)
+        except Karyawan.DoesNotExist:
+            return Response({
+                "error": "Karyawan tidak ditemukan"
+            }, status=status.HTTP_404_NOT_FOUND)
 
-            serializer = KaryawanSerializer(karyawan, many=True)
-            return Response(serializer.data)
-
+        serializer = KaryawanSerializer(karyawan)
+        return Response(serializer.data)
 
     
 class KaryawanCreate(APIView):
