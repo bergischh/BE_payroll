@@ -14,6 +14,7 @@ import CardModal from "./components/CardModal";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import ButtonPagination from "./components/ButtonPagination";
 import React from "react";
+import { fetchDataTunjangan } from "../../../api/axios";
 
 const TunjanganKaryawan = () => {
     const [selectedUser, setSelectedUser] = React.useState(null);
@@ -46,22 +47,34 @@ const TunjanganKaryawan = () => {
         };
     }, [selectedUser]);
 
-    const [users] = useState([
-        { id: 1, nama: "Innalillahi Aliyah", jabatan: "admin", tunjanganM: "200.000", tunjanganK: "300.000",  tunjanganJ: "300.000", thr: "300.000", bonus: "300.000" },
-        { id: 2, nama: "Innalillahi Mata kiri", jabatan: "manager", tunjanganM: "200.000", tunjanganK: "300.000",  tunjanganJ: "300.000", thr: "300.000", bonus: "300.000" },
-        { id: 3, nama: "Michael Jachkson", jabatan: "karyawan", tunjanganM: "200.000", tunjanganK: "300.000",  tunjanganJ: "300.000", thr: "300.000", bonus: "300.000" },
-        { id: 4, nama: "user4", jabatan: "cal-karyawan", tunjanganM: "200.000", tunjanganK: "300.000",  tunjanganJ: "300.000", thr: "300.000", bonus: "300.000" },
-        { id: 5, nama: "user5", jabatan: "admin", tunjanganM: "200.000", tunjanganK: "300.000",  tunjanganJ: "300.000", thr: "300.000", bonus: "300.000" },
-    ]);
-    const TABLE_HEAD = ["No", "Nama Karyawan", "Jabatan", "Tunjangan Makan", "Tunjangan Kesehatan", "Tunjangan Jabatan", "THR", "Bonus", "Action"];
 
-    // loading
+   // State for users, loading, and error
+    const [dataTunjangan, setDataTunjangan] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    // useEffect(() => {
+    //     // Simulasi loading data selama 0.8 detik
+    //     const timer = setTimeout(() => setLoading(false), 800);
+    //     return () => clearTimeout(timer);
+    // }, []);
 
     useEffect(() => {
-        // Simulasi loading data selama 0.8 detik
-        const timer = setTimeout(() => setLoading(false), 800);
-        return () => clearTimeout(timer);
+        const getTunjangan = async () => {
+            try {
+                setLoading(true);
+                const data = await fetchDataTunjangan();
+                console.log("Fetched Data Tunjangan:", data)
+                setDataTunjangan(Array.isArray(data)? data : [data]);
+            } catch (error) {
+                console.error("Error fetching users:", error);
+                setError(error.message || "Failed to fetch users");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        getTunjangan();
     }, []);
 
     if (loading) {
@@ -71,9 +84,16 @@ const TunjanganKaryawan = () => {
             </div>
         );
     }
+
+    if (error) {
+      return <div className="text-center">{error}</div>;
+    }
+
+    const TABLE_HEAD = ["No", "Nama Karyawan", "Jabatan", "Tunjangan Makan", "Tunjangan Kesehatan", "Tunjangan Jabatan", "THR", "Bonus", "Action"];
+
     return (
         <>
-        <div className="flex flex-col h-screen">
+        <div className="flex flex-col h-screen"> 
             <div className="overflow-y-auto mac-scrollbar mac-scrollbar-x mac-scrollbar-y mb-20 pr-4">
                 <h1 className="text-gray-500 mt-5 mb-16">Tunjangan Karyawan</h1>
                 <div className="flex justify-between mb-3">
@@ -102,8 +122,8 @@ const TunjanganKaryawan = () => {
                         </tr>
                     </thead>
                     <tbody className="my-4 drop-shadow-md">
-                        {users.length > 0 ? (
-                            users.map(({ id, nama, jabatan, tunjanganM, tunjanganK, tunjanganJ, thr, bonus }, index) => (
+                        {dataTunjangan.length > 0 ? (
+                            dataTunjangan.map(({ id, karyawan_nama, karyawan_jabatan, tunjangan_makan, tunjangan_kesehatan, tunjangan_jabatan, THR, bonus }, index) => (
                                 <tr key={id}>
                                     <td className="p-4 border-b border-blue-gray-50">
                                         <Typography variant="small" color="blue-gray" className="font-bold">
@@ -112,32 +132,32 @@ const TunjanganKaryawan = () => {
                                     </td>
                                     <td className="p-4 border-b border-blue-gray-50">
                                         <Typography variant="small" color="blue-gray" className="font-normal">
-                                            {nama}
+                                            {karyawan_nama}
                                         </Typography>
                                     </td>
                                     <td className="p-4 border-b border-blue-gray-50">
                                         <Typography variant="small" color="blue-gray" className="font-normal">
-                                            {jabatan}
+                                            {karyawan_jabatan}
                                         </Typography>
                                     </td>
                                     <td className="p-4 border-b border-blue-gray-50">
                                         <Typography variant="small" color="blue-gray" className="font-normal">
-                                            {tunjanganM}
+                                            {tunjangan_makan}
                                         </Typography>
                                     </td>
                                     <td className="p-4 border-b border-blue-gray-50">
                                         <Typography variant="small" color="blue-gray" className="font-normal">
-                                            {tunjanganK}
+                                            {tunjangan_kesehatan}
                                         </Typography>
                                     </td>
                                     <td className="p-4 border-b border-blue-gray-50">
                                         <Typography variant="small" color="blue-gray" className="font-normal">
-                                            {tunjanganJ}
+                                            {tunjangan_jabatan}
                                         </Typography>
                                     </td>
                                     <td className="p-4 border-b border-blue-gray-50">
                                         <Typography variant="small" color="blue-gray" className="font-normal">
-                                            {thr}
+                                            {THR}
                                         </Typography>
                                     </td>
                                     <td className="p-4 border-b border-blue-gray-50">

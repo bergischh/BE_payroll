@@ -17,6 +17,7 @@ import ButtonPagination from "../components/ButtonPagination.jsx";
 import CardModal from "../components/CardModal.jsx";
 import SearchTable from "../components/SearchTable.jsx";
 import CardPinjam from "../components/CardPinjam.jsx";
+import { fetchDataPinjaman } from "../../../../api/axios.js";
 
 const Pinjaman = () => {
     const [selectedUser, setSelectedUser] = React.useState(null);
@@ -49,22 +50,34 @@ const Pinjaman = () => {
         };
     }, [selectedUser]);
 
-    const [users] = useState([
-        { id: 1,nik: 12222039, nama: "Innalillahi Aliyah", jumlah: 200000, tanggal: "29/07/2025", tenggat: "15/08/2025" },
-        { id: 2,nik: 12222039, nama: "Innalillahi Mata kiri", jumlah: 300000, tanggal: "29/07/2025", tenggat: "15/08/2025" },
-        { id: 3,nik: 12222039, nama: "Michael Jachkson", jumlah: 1000000, tanggal: "29/07/2025", tenggat: "15/08/2025" },
-        { id: 4,nik: 12222039, nama: "user4", jumlah: 50000, tanggal: "29/07/2025", tenggat: "15/08/2025" },
-        { id: 5,nik: 12222039, nama: "user5", jumlah: 200000, tanggal: "29/07/2025", tenggat: "15/08/2025" },
-    ]);
-    const TABLE_HEAD = ["No", "NIK", "Nama Karyawan", "Jumlah", "Tanggal", "Tenggat", "Action"];
-    
-    // loading
+   // State for users, loading, and error
+    const [dataPinjaman, setDataPinjaman] = useState([]);
     const [loading, setLoading] = useState(true);
-    useEffect(() => {
-        // Simulasi loading data selama 0.8 detik
-        const timer = setTimeout(() => setLoading(false), 800);
-        return () => clearTimeout(timer);
-    }, []);
+    const [error, setError] = useState(null);    
+  
+    // useEffect(() => {
+    //     // Simulasi loading data selama 0.8 detik
+    //     const timer = setTimeout(() => setLoading(false), 800);
+    //     return () => clearTimeout(timer);
+    // }, []);
+
+     useEffect(() => {
+            const getPinjaman = async () => {
+                try {
+                    setLoading(true);
+                    const data = await fetchDataPinjaman();
+                    console.log("Fetched Data Pinjaman:", data)
+                    setDataPinjaman(Array.isArray(data)? data : [data]);
+                } catch (error) {
+                    console.error("Error fetching users:", error);
+                    setError(error.message || "Failed to fetch users");
+                } finally {
+                    setLoading(false);
+                }
+            };
+    
+            getPinjaman();
+        }, []);
 
     if (loading) {
         return (
@@ -73,6 +86,13 @@ const Pinjaman = () => {
             </div>
         );
     }
+
+    if (error) {
+      return <div className="text-center">{error}</div>;
+    }
+
+    const TABLE_HEAD = ["No", "NIK", "Nama Karyawan", "Jumlah", "Tanggal", "Tenggat", "Action"];
+
     return (
         <>
         <div className="flex flex-col h-screen">
@@ -117,8 +137,8 @@ const Pinjaman = () => {
                         </tr>
                     </thead>
                     <tbody className="my-4 drop-shadow-md">
-                        {users.length > 0 ? (
-                            users.map(({ id, nik, nama, jumlah, tanggal, tenggat  }, index) => (
+                        {dataPinjaman.length > 0 ? (
+                            dataPinjaman.map(({ id, karyawan_nik, karyawan_nama, jumlah_pinjaman, tanggal_pinjaman, tenggat_pinjaman  }, index) => (
                                 <tr key={id}>
                                     <td className="p-4 border-b border-blue-gray-50">
                                         <Typography variant="small" color="blue-gray" className="font-bold">
@@ -127,27 +147,27 @@ const Pinjaman = () => {
                                     </td>
                                     <td className="p-4 border-b border-blue-gray-50">
                                         <Typography variant="small" color="blue-gray" className="font-normal">
-                                            {nik}
+                                            {karyawan_nik}
                                         </Typography>
                                     </td>
                                     <td className="p-4 border-b border-blue-gray-50">
                                         <Typography variant="small" color="blue-gray" className="font-normal">
-                                            {nama}
+                                            {karyawan_nama}
                                         </Typography>
                                     </td>
                                     <td className="p-4 border-b border-blue-gray-50">
                                         <Typography variant="small" color="blue-gray" className="font-normal">
-                                            {jumlah}
+                                            {jumlah_pinjaman}
                                         </Typography>
                                     </td>
                                     <td className="p-4 border-b border-blue-gray-50">
                                         <Typography variant="small" color="blue-gray" className="font-normal">
-                                            {tanggal}
+                                            {tanggal_pinjaman}
                                         </Typography>
                                     </td>
                                     <td className="p-4 border-b border-blue-gray-50">
                                         <Typography variant="small" color="blue-gray" className="font-normal">
-                                            {tenggat}
+                                            {tenggat_pinjaman}
                                         </Typography>
                                     </td>
                                     <td className="p-4 border-b border-blue-gray-50">

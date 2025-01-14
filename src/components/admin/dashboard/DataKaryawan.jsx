@@ -16,6 +16,7 @@ import React from "react";
 import ButtonPagination from "./components/ButtonPagination";
 import { Link } from "react-router-dom";
 import { fetchDataKaryawan } from "../../../api/axios";
+import DetailKaryawan from "./DetailKaryawan";
 
 
 const DataKaryawan = ({ onAllowDetail }) => {
@@ -30,6 +31,7 @@ const DataKaryawan = ({ onAllowDetail }) => {
         setSelectedUser(null);
     };
     
+
     useEffect(() => {
         const handleClickOutside = (event) => {
             // Check if the click is outside the popover
@@ -88,6 +90,18 @@ const DataKaryawan = ({ onAllowDetail }) => {
         return () => clearTimeout(timer);
     }, []);
 
+    const [showDetail, setShowDetail] = useState(false);
+    const [selectedId, setSelectedId] = useState(null);
+
+    const handleDetail = (id) => {
+        setShowDetail(true);
+        setSelectedId(id);
+    };
+
+    if (showDetail) {
+        return <DetailKaryawan id={selectedId} />;
+    }
+
     if (loading) {
         return (
             <div className="flex items-center justify-center h-screen">
@@ -107,15 +121,6 @@ const DataKaryawan = ({ onAllowDetail }) => {
             <h1 className="text-gray-500 mt-5 mb-16">Data Karyawan</h1>
             <div className="flex justify-between mb-3">
                 <SearchTable/>
-                <CardModal 
-                        toptitle="Tambah data karyawan"
-                        icon={<Icon icon="mdi:account" />}
-                        iconbtn="iconamoon:folder-add-light"
-                        ukiconbtn="h-6 w-6 color-white"
-                        backg="bg-[#7E679F]"
-                        wbtn="flex items-center gap-3 p-2"
-                        button={<Button color="blue" className="p-3">Reset</Button>}
-                    />
             </div>
             <table className="w-full min-w-max table-auto text-left">
                     <thead className="rounded-lg">
@@ -159,7 +164,7 @@ const DataKaryawan = ({ onAllowDetail }) => {
                                                 <div className="flex flex-col gap-2">
                                                     <Button color="blue" size="sm" onClick={() => {
                                                             handleClose();
-                                                            onAllowDetail();
+                                                            handleDetail(id);
                                                         }} fullWidth className="flex px-2">
                                                        <Icon icon="carbon:user-profile" className="h-4 w-4 mr-2" />
                                                        <Link>Detail</Link>

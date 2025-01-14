@@ -14,6 +14,8 @@ import Pendiri from './components/company/content/content-compo/Pendiri.jsx'
 import Latar from './components/company/content/content-compo/Latar.jsx'
 import Sidebar from './components/admin/Sidebar.jsx'
 import DataKaryawan from './components/admin/dashboard/DataKaryawan.jsx'
+import DashRecruitmen from './components/recruitmen/DashRecruitmen.jsx'
+import SidebarRec from './components/recruitmen/SidebarRec.jsx'
 
 const router = createBrowserRouter([
   {
@@ -59,6 +61,14 @@ const router = createBrowserRouter([
   {
     path:"/DataKaryawan",
     element: <DataKaryawan />,
+  },
+  {
+    path:"/Recruitmen",
+    element: <DashRecruitmen />,
+  },
+  {
+    path:"/Pengisian",
+    element: <SidebarRec />,
   },
 ])
 

@@ -20,6 +20,14 @@ import React from "react";
 import CardModal from "./components/CardModal";
 import ButtonPagination from "./components/ButtonPagination";
 import { fetchUsers } from "../../../api/axios"
+import { deleteUser } from "../../../api/axios";
+import { 
+  InputEmail,
+  InputUsername,
+  InputPassword,
+  KonfirPass,
+  InputRole,
+} from "./components/Inputan";
 
 const Users = () => {
     const [selectedUser, setSelectedUser] = React.useState(null);
@@ -56,28 +64,21 @@ const Users = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [selectedRoles, setSelectedRoles] = useState([]);
 
-    // kode yang bener nangkep API nya array
-    // useEffect(() => {
-    //     const getUsers = async () => {
-    //         try {
-    //             setLoading(true);
-    //             const data = await fetchUsers();
-    //             console.log("Fetched users:", data); // Debug respons API
-    //             setUsers(data); // Set users ke state
-    //         } catch (error) {
-    //             console.error("Error fetching users:", error);
-    //             setError(error.message || "Failed to fetch users");
-    //         } finally {
-    //             setLoading(false);
-    //         }
-    //     };
-    
-    //     getUsers();
-    // }, []);
+    const handleRoleFilterChange = (role) => {
+        setSelectedRoles((prevRoles) =>
+            prevRoles.includes(role)
+                ? prevRoles.filter((r) => r !== role) // Hapus jika sudah ada
+                : [...prevRoles, role] // Tambahkan jika belum ada
+        );
+    };
 
-    //kode cadangan tangkap api objek tunggal bukan array(jdi cuman bisa ambil satu data objek)
-    // ada perbaikan di backend supaya api yang dikirim bukan objek tunggal
+    const filteredUsers = selectedRoles.length
+    ? users.filter((user) => selectedRoles.includes(user.role))
+    : users;
+
+    // Fetch Users
     useEffect(() => {
         const getUsers = async () => {
             try {
@@ -95,8 +96,21 @@ const Users = () => {
     
         getUsers();
     }, []);
-    
-    
+
+    // Delete Users
+    const handleDeleteUser = async (id) => {
+        try {
+          console.log("Deleting user ID:", id);
+          await deleteUser(id); // Panggil fungsi dari axios.js
+          // Refresh data setelah delete
+          const data = await fetchUsers();
+          setUsers(Array.isArray(data) ? data : [data]); // Perbarui daftar user
+          alert("User successfully deleted.");
+        } catch (error) {
+          console.error("Error delete users:", error);
+          alert("User failed to delete.");
+        }
+      };
 
     if (loading) {
         return (
@@ -130,7 +144,7 @@ const Users = () => {
                                     </Button>
                                 </MenuHandler>
                                 <MenuList>
-                                    {["admin", "manager", "karyawan", "cal-karyawan"].map((role, index) => (
+                                    {["admin", "manager", "karyawan", "calon_karyawan"].map((role, index) => (
                                         <MenuItem key={role} className="p-0">
                                             <label htmlFor={`role-${index}`} className="flex cursor-pointer items-center gap-2 p-2">
                                                 <Checkbox
@@ -138,6 +152,8 @@ const Users = () => {
                                                     id={`role-${index}`}
                                                     containerProps={{ className: "p-0" }}
                                                     className="hover:before:content-none"
+                                                    checked={selectedRoles.includes(role)}
+                                                    onChange={() => handleRoleFilterChange(role)}
                                                 />
                                                 {role}
                                             </label>
@@ -148,13 +164,18 @@ const Users = () => {
                         </div>
                         <CardModal
                             toptitle="Tambah akun User"
-                            icon={<Icon icon="mdi:account" />}
+                            icon={<Icon icon="mdi:account" className="w-8 h-8"/>}
                             namabtn="Tambah User"
                             iconbtn="iconamoon:folder-add-light"
                             ukiconbtn="h-6 w-6 color-white mr-1"
                             backg="bg-[#7E679F]"
                             wbtn="flex items-center gap-3 p-2"
-                            button={<Button color="blue" className="p-3">Reset</Button>}
+                            input1 = {<InputUsername />}
+                            input2 = {<InputEmail />}
+                            input3 = {<InputRole />}
+                            input4 = {<InputPassword />}  
+                            input5 = {<KonfirPass />}
+                            button={<Button color="blue" className="p-3" type="reset">Reset</Button>}
                         />
                     </div>
                     <table className="w-full min-w-max table-auto text-left">
@@ -170,8 +191,8 @@ const Users = () => {
                             </tr>
                         </thead>
                         <tbody className="my-4 drop-shadow-md">
-                            {users.length > 0 ? (
-                                users.map(({ id, username, role, email }, index) => (
+                            {filteredUsers.length > 0 ? (
+                                filteredUsers.map(({ id, username, role, email }, index) => (
                                     <tr key={id}>
                                         <td className="p-4 border-b border-blue-gray-50">
                                             <Typography variant="small" color="blue-gray" className="font-bold">
@@ -202,10 +223,6 @@ const Users = () => {
                                                 </PopoverHandler>
                                                 <PopoverContent className="p-2" ref={popoverRef}>
                                                     <div className="flex flex-col gap-2">
-                                                        <Button color="blue" size="sm" onClick={handleClose} fullWidth className="flex px-2">
-                                                           <Icon icon="carbon:user-profile" className="h-4 w-4 mr-2" />
-                                                            Detail
-                                                        </Button>
                                                         <CardModal
                                                             toptitle="Form Registrasi"
                                                             icon={<Icon icon="mdi:account" />}
@@ -216,7 +233,7 @@ const Users = () => {
                                                             wbtn="p-2"
                                                             onClick={handleClose}
                                                         />
-                                                        <Button color="red" size="sm" onClick={handleClose} fullWidth className="flex px-2">
+                                                        <Button color="red" size="sm" onClick={() => handleDeleteUser(id)} fullWidth className="flex px-2">
                                                             <Icon icon="material-symbols:delete-outline" className="h-4 w-4 mr-2" />
                                                             Delete
                                                         </Button>

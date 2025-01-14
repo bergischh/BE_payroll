@@ -104,7 +104,7 @@ export function StickyNavbar() {
                                 />
                             </svg>
                         )}
-                  </IconButton>
+                  </IconButton> 
                 </div>
                 <Collapse open={openNav}>
                     {navList}

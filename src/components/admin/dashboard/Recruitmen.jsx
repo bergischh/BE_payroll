@@ -23,7 +23,7 @@ const Recruitment = () => {
         );
     }
     return(
-        <>
+        <> 
             <div className="flex flex-col h-screen">
                 <div className="overflow-y-auto mac-scrollbar mac-scrollbar-x mac-scrollbar-y mb-20 pr-4">
                     <div className="w-full mb-8">

@@ -12,32 +12,39 @@ import {
 import { Icon } from "@iconify/react/dist/iconify.js";
 import ListData from "./components/listData";
 import { useState, useEffect } from "react";
-import { fetchDataKaryawan } from "../../../api/axios";
+import { fetchDetailKaryawan } from "../../../api/axios";
+import Cropper from "react-cropper";
+import "cropperjs/dist/cropper.css";
 
-const DetailKaryawan = () => {
+const DetailKaryawan = ({id}) => {
     const [activeTab, setActiveTab] = useState("biodata");
     const [dataKaryawan, setDataKaryawan] = useState(null); // State untuk data karyawan
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     const apiUrl = "http://127.0.0.1:8000/"; // URL dasar API Anda
-    const fotoUrl = `${apiUrl}api/karyawan${dataKaryawan?.foto}`; // URL gambar foto karyawan
+    const fotoUrl = `${apiUrl}${dataKaryawan?.foto}`; // URL gambar foto karyawan
 
     useEffect(() => {
         const getKaryawan = async () => {
-            try {
-                setLoading(true);
-                const response = await fetchDataKaryawan(); // Ambil data karyawan
-                console.log("API response data:", response); // Debug untuk melihat data API
-                setDataKaryawan(response[0]); // Ambil objek pertama dari array
-            } catch (err) {
-                setError("Error fetching data");
-            } finally {
-                setLoading(false);
+          try {
+            setLoading(true);
+            const response = await fetchDetailKaryawan(id);
+            if (response) {
+              setDataKaryawan(response);
+            } else {
+              setError("Data tidak ditemukan");
             }
+          } catch (err) {
+            setError("Error fetching data");
+          } finally {
+            setLoading(false);
+          }
         };
         getKaryawan();
-    }, []);
+      }, [id]);
+      
+      
 
     if (loading) {
         return (
@@ -95,11 +102,11 @@ const DetailKaryawan = () => {
                             <img
                                 src={fotoUrl} // fallback gambar jika foto karyawan tidak ditemukan
                                 alt="profile-picture"
-                                className="w-48 mx-auto rounded-full"
+                                className="w-48 mx-auto rounded-full max-h-[185.65px] max-w-[185.65px] object-cover"
                                 onError={() => console.log("Foto gagal dimuat dengan URL:", fotoUrl)}
                             />
                             <Typography variant="h5" color="blue-gray">
-                                {dataKaryawan?.nama}
+                                {dataKaryawan?.nama_karyawan}
                             </Typography>
                             <Typography color="blue-gray" className="font-medium" textGradient>
                                 {dataKaryawan?.jabatan}

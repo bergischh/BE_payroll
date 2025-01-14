@@ -17,6 +17,7 @@ function Login() {
   const [errMsg, setErrMsg] = useState("");
   const [success, setSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [role, setRole] = useState(""); // State to store the user's role
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,17 +31,29 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await loginUser({ username: user, password: pwd });
+      const response = await loginUser({ username: user, password: pwd });x
       console.log(response);
 
       if (response.status === 200) {
         setSuccess(true);
         setUser("");
         setPwd("");
-        navigate("/adminSidebar"); // Redirect after successful login
+        
+        // Assuming the API response contains the role
+        setRole(response.data.role); // Set role based on response
+
+        // Arahkan berdasarkan role
+        if (response.data.role === "admin") {
+          navigate("/adminSidebar");
+        } else if (response.data.role === "calon_karyawan") {
+          navigate("/Pengisian");
+        } else {
+          navigate("/"); // Default fallback jika role tidak dikenal
+        }
       }
     } catch (err) {
       setErrMsg("Login Failed");
+      console.log(err);
       errRef.current.focus();
     }
   };
@@ -100,9 +113,7 @@ function Login() {
                       placeholder="Password"
                     />
                     <Icon
-                      icon={
-                        showPassword ? "iconamoon:eye" : "iconamoon:eye-off"
-                      }
+                      icon={showPassword ? "iconamoon:eye" : "iconamoon:eye-off"}
                       onClick={togglePasswordVisibility}
                       className="absolute right-3 top-2/3 transform -translate-y-1/2 text-gray-500 cursor-pointer"
                     />

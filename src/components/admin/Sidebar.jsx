@@ -100,7 +100,7 @@ const Sidebar = () => {
                                 {menu.subMenus && (
                                     <Icon
                                         icon="mdi:chevron-down"
-                                        className={`ml-auto duration-200 ${openAccordion === menu.title ? "rotate-180" : ""}`}
+                                        className={`text-xl ml-auto duration-200 ${openAccordion === menu.title ? "rotate-180" : ""}`}
                                     />
                                 )}
                             </div>
