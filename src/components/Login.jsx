@@ -31,7 +31,7 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await loginUser({ username: user, password: pwd });x
+      const response = await loginUser({ username: user, password: pwd });
       console.log(response);
 
       if (response.status === 200) {
