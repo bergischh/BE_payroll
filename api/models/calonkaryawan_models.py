@@ -56,6 +56,7 @@ class CalonKaryawan(models.Model):
             ),
         ],
     ) 
+    deskripsi = models.CharField(max_length=180, default="Tidak ada deskripsi")
     photo = models.ImageField(upload_to=user_directory_path, null=True, blank=True)
     ktp = models.FileField(upload_to=ktp_upload_path, null=True, blank=True)
     ijazah = models.FileField(upload_to=ijazah_upload_path, null=True, blank=True)
