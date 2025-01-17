@@ -1,5 +1,5 @@
 import { Icon } from "@iconify/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import React from "react";
 import Dashboard from "../admin/dashboard/Dashboard.jsx";
 import Users from "../admin/dashboard/Users.jsx";
@@ -9,12 +9,25 @@ import Pinjaman from "./dashboard/Pinjaman-karyawan/Pinjaman.jsx";
 import Pembayaran from "./dashboard/Pinjaman-karyawan/Pembayaran.jsx";
 import Recruitment from "./dashboard/Recruitmen.jsx";
 import DetailKaryawan from "./dashboard/DetailKaryawan.jsx";
+import PermissionRole from "./dashboard/PermissionROle.jsx";
+import PeriodePenggajian from "./dashboard/PeriodePenggajian.jsx";
+// import { useNavigate } from "react-router-dom";
+// import Cookies from "js-cookie";
 
 const Sidebar = () => {
+    // const navigate = useNavigate();
     const [open, setOpen] = useState(true);
     const [activePage, setActivePage] = useState("Dashboard");
     const [openAccordion, setOpenAccordion] = useState(null); // Track which accordion is open
     const [allowDetailAccess, setAllowDetailAccess] = useState(false); // Track if DetailKaryawan access is allowed
+
+    // useEffect(() => {
+    //     const token = Cookies.get("token");
+    //     if (!token) {
+    //         navigate("/login");
+    //     }
+    // }, [navigate]); // Tambahkan `navigate` sebagai dependency
+    
 
     const menus = [
         { title: "Dashboard", icon: "ion:home", component: Dashboard },
@@ -42,6 +55,9 @@ const Sidebar = () => {
         },
         { title: "Laporan Penggajian", icon: "tabler:report" },
         { title: "Recruitmen", icon: "fluent-mdl2:recruitment-management", component: Recruitment },
+        { title: "Logout", icon: "charm:sign-out" },
+        { title: "Permission", icon: "tdesign:user-setting-filled", component: PermissionRole },
+        { title: "Periode Penggajian", icon: "grommet-icons:money", component: PeriodePenggajian },
     ];
 
     const activeMenu = menus.find(
@@ -57,7 +73,7 @@ const Sidebar = () => {
 
     return (
         <div className="flex">
-            <div className={`${open ? "w-72" : "w-20"} duration-300 h-screen bg-[#A996C5] relative`}>
+            <div className={`${open ? "w-72" : "w-20"} duration-300 h-screen bg-[#A996C5] relative max-h-screen`}>
                 <Icon
                     icon="ri:arrow-left-double-line"
                     className={`absolute cursor-pointer rounded-full right-1 mr-[-18px] top-9 bg-[#a3a3a3] text-white h-7 w-7 border ${
@@ -129,7 +145,7 @@ const Sidebar = () => {
             </div>
             <div className="py-5 pr-5 text-2xl font-semibold flex-1 bg-[#A996C5]">
                 <div
-                    className="bg-white rounded-2xl content ps-5 pt-5 pb-5 pr-4 overflow-y-hidden"
+                    className="bg-[#F8F7F7] rounded-2xl content ps-5 pt-5 pb-5 pr-4 overflow-y-hidden"
                     style={{ height: "calc(100vh - 40px)" }}
                 >
                     {activeComponent ? (

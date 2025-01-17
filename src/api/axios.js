@@ -160,9 +160,40 @@ export const addDataCalonKaryawan = async (calonKaryawanData) => {
   }
 };
 
-
-
-
+// Fungsi untuk fetch data calon karyawan
+export const fetchDataCalonKaryawan = async () => {
+  try {
+      const token = Cookies.get("token"); // Gunakan Cookies.get untuk mengambil token
+      console.log("Token:", token); // Debug token
+      const response = await axios.get(`${apiUrl}api/calon-karyawan/`, {
+          headers: {
+              Authorization: `Bearer ${token}`,
+          },
+      });
+      console.log("API response data:", response.data);
+      return response.data;
+  } catch (error) {
+      console.error("Error fetching users:", error);
+      throw error;
+  }
+};
+// Fungsi untuk fetch data calon karyawan
+export const fetchDetailCalonKaryawan = async (id) => {
+  try {
+      const token = Cookies.get("token"); // Gunakan Cookies.get untuk mengambil token
+      console.log("Token:", token); // Debug token
+      const response = await axios.get(`${apiUrl}api/calon-karyawan/${id}`, {
+          headers: {
+              Authorization: `Bearer ${token}`,
+          },
+      });
+      console.log("API response data:", response.data);
+      return response.data;
+  } catch (error) {
+      console.error("Error fetching users:", error);
+      throw error;
+  }
+};
 
 // Fungsi untuk fetch datakaryawan
 export const fetchDataKaryawan = async () => {

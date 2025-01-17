@@ -242,8 +242,8 @@ const Biodata = () => {
                             value={jenis_kelamin}
                             onChange={handleGenderChange}  // Hanya memanggil fungsi handler tanpa event
                         >
-                            <Option value="laki_laki">laki_laki</Option>
-                            <Option value="perempuan">perempuan</Option>
+                            <Option value="laki_laki">Pria</Option>
+                            <Option value="perempuan">Wanita</Option>
                         </Select>
 
                         <Select 
@@ -252,8 +252,8 @@ const Biodata = () => {
                             value={status}
                             onChange={(value) => setStatus(value)}  // Memanggil langsung nilai yang diterima
                         >
-                            <Option value="kawin">kawin</Option>
-                            <Option value="belum_kawin">belum_kawin</Option>
+                            <Option value="kawin">Menikah</Option>
+                            <Option value="belum_kawin">Belum Menikah</Option>
                         </Select>
 
                         <Input 

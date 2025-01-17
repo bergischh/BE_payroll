@@ -45,6 +45,7 @@ function Login() {
         // Arahkan berdasarkan role
         if (response.data.role === "admin") {
           navigate("/adminSidebar");
+          alert('Anda Berhasil Login');
         } else if (response.data.role === "calon_karyawan") {
           navigate("/Pengisian");
         } else {

@@ -13,7 +13,7 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import ListData from "./components/listData";
 import { useState, useEffect } from "react";
 import { fetchDetailKaryawan } from "../../../api/axios";
-import Cropper from "react-cropper";
+// import Cropper from "react-cropper";
 import "cropperjs/dist/cropper.css";
 
 const DetailKaryawan = ({id}) => {
