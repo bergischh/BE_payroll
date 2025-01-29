@@ -1,7 +1,7 @@
 from .user_views import RegisterView, LoginView, UpdateUserView, UserAPIView, RefreshAPIView, LogoutView
 from .departement_views import DepartementCreate, DepartementView
-from .karyawan_views import KaryawanViews, KaryawanCreate, KaryawanUpdate, KaryawanDelete, KaryawanViewsId
-from .calonkaryawan_views import CalonKaryawanView, CalonKaryawanCreate, CalonKaryawanUpdate, CalonKaryawanDelete
+from .karyawan_views import KaryawanViews, KaryawanCreate, KaryawanUpdate, KaryawanDelete, KaryawanDetail
+from .calonkaryawan_views import CalonKaryawanView, CalonKaryawanCreate, CalonKaryawanUpdate, CalonKaryawanDelete, CalonKaryawanDetail
 from .tunjangan_views import TunjanganView, TunjanganCreate, TunjanganUpdate, TunjanganDelete
 from .pinjaman_views import PinjamanView, PinjamanCreate, PinjamanUpdate, PinjamanDelete
 from .kehadiran_views import KehadiranView, KehadiranCreate, KehadiranUpdate, KehadiranDelete

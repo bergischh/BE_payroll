@@ -50,7 +50,7 @@ class KaryawanViews(APIView):
         return Response(serializer.data)
     
 
-class KaryawanViewsId(APIView):
+class KaryawanDetail(APIView):
     def get(self, request, id):
         auth_header = request.headers.get('Authorization')
         token = None
@@ -63,7 +63,7 @@ class KaryawanViewsId(APIView):
         if not token:
             return Response({
                 "error": "Token tidak ada, tolong masukkan token"
-            })
+            }, status=status.HTTP_401_UNAUTHORIZED)
 
         try:
             user_id = decode_access_token(token)
@@ -89,7 +89,8 @@ class KaryawanViewsId(APIView):
             }, status=status.HTTP_404_NOT_FOUND)
 
         serializer = KaryawanSerializer(karyawan)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
     
 class KaryawanCreate(APIView):

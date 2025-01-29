@@ -17,6 +17,52 @@ class CalonKaryawanView(APIView):
         serializer = CalonKaryawanSerializer(candidate, many = True)
         return Response(serializer.data)
     
+class CalonKaryawanDetail(APIView):
+    def get(self, request, id):
+        auth_header = request.headers.get('Authorization')
+        token = None
+
+        if auth_header and auth_header.startswith('Bearer '):
+            token = auth_header.split(' ')[1]
+        else:
+            token = request.COOKIES.get('accessToken')
+
+        if not token:
+            return Response({
+                "error": "Token tidak ada, tolong masukkan token"
+            }, status=status.HTTP_401_UNAUTHORIZED)
+
+        try:
+            user_id = decode_access_token(token)
+        except exceptions.AuthenticationFailed:
+            return Response({
+                "error": "Anda tidak memiliki akses."
+            }, status=status.HTTP_401_UNAUTHORIZED)
+
+        user = get_object_or_404(User, id=user_id)
+
+        try:
+            if user.role in ['admin', 'manager']:
+                candidate = CalonKaryawan.objects.get(id=id)
+            elif user.role == 'calon_karyawan':
+                candidate = CalonKaryawan.objects.get(id=id, user=user)
+            else:
+                return Response({
+                    "error": "Invalid user role"
+                }, status=status.HTTP_403_FORBIDDEN)
+        except CalonKaryawan.DoesNotExist:
+            return Response({
+                "error": "Calon Karyawan tidak ditemukan"
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = CalonKaryawanSerializer(candidate)
+        return Response(serializer.data)
+
+
+# class CalonKaryawanDetail(APIView):
+#     def get(self, id):
+
+    
 class CalonKaryawanCreate(APIView):
     parser_classes = [MultiPartParser, FormParser]
 

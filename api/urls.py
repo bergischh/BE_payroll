@@ -2,9 +2,9 @@ from django.urls import path
 
 
 from .views.user_views import RegisterView, LoginView, UserAPIView, RefreshAPIView, LogoutView, UpdateUserView, UserDelete
-from .views.karyawan_views import KaryawanViews, KaryawanCreate, KaryawanUpdate, KaryawanDelete, KaryawanViewsId
+from .views.karyawan_views import KaryawanViews, KaryawanCreate, KaryawanUpdate, KaryawanDelete, KaryawanDetail
 from .views.departement_views import DepartementView, DepartementCreate, DepartmentUpdate, DepartmentDelete
-from .views.calonkaryawan_views import CalonKaryawanView, CalonKaryawanCreate, CalonKaryawanUpdate, CalonKaryawanDelete, CalonKaryawanAccept, CalonKaryawanReject
+from .views.calonkaryawan_views import CalonKaryawanView, CalonKaryawanCreate, CalonKaryawanUpdate, CalonKaryawanDelete, CalonKaryawanAccept, CalonKaryawanReject, CalonKaryawanDetail
 from .views.tunjangan_views import TunjanganView, TunjanganCreate, TunjanganUpdate, TunjanganDelete
 from .views.pinjaman_views import PinjamanView, PinjamanCreate, PinjamanUpdate, PinjamanDelete, PeminjamanApproval
 from .views.kehadiran_views import KehadiranView, KehadiranCreate, KehadiranUpdate, KehadiranDelete, KehadiranApproval, KehadiranChartView
@@ -35,7 +35,7 @@ urlpatterns = [
 
     # karyawan
     path('karyawan/', KaryawanViews.as_view(), name='karyawan'),
-    path('karyawan/<int:id>/', KaryawanViewsId.as_view(), name='karyawan'),
+    path('karyawan/<int:id>/', KaryawanDetail.as_view(), name='karyawan'),
     path('create-karyawan/', KaryawanCreate.as_view(), name='karyawan-create'), 
     path('update-karyawan/<int:id>/', KaryawanUpdate.as_view(), name='karyawan-update'), 
     path('delete-karyawan/<int:id>/', KaryawanDelete.as_view(), name='karyawan-delete'), 
@@ -48,6 +48,8 @@ urlpatterns = [
 
     # calon karyawan 
     path('calon-karyawan/', CalonKaryawanView.as_view(), name='calon-karyawan'),
+    path('calon-karyawan/<int:id>/', CalonKaryawanView.as_view(), name='calon-karyawan-detail'),
+    path('create-calon-karyawan/', CalonKaryawanCreate.as_view(), name='calon-karyawan-create'), 
     path('create-calon-karyawan/', CalonKaryawanCreate.as_view(), name='calon-karyawan-create'), 
     path('update-calon-karyawan/<int:id>/', CalonKaryawanUpdate.as_view(), name='calon-karyawan-update'),
     path('delete-calon-karyawan/<int:id>/', CalonKaryawanDelete.as_view(), name='calon-karyawan-delete'), 
