@@ -48,7 +48,7 @@ urlpatterns = [
 
     # calon karyawan 
     path('calon-karyawan/', CalonKaryawanView.as_view(), name='calon-karyawan'),
-    path('calon-karyawan/<int:id>/', CalonKaryawanView.as_view(), name='calon-karyawan-detail'),
+    path('calon-karyawan/<int:id>/', CalonKaryawanDetail.as_view(), name='calon-karyawan-detail'),
     path('create-calon-karyawan/', CalonKaryawanCreate.as_view(), name='calon-karyawan-create'), 
     path('create-calon-karyawan/', CalonKaryawanCreate.as_view(), name='calon-karyawan-create'), 
     path('update-calon-karyawan/<int:id>/', CalonKaryawanUpdate.as_view(), name='calon-karyawan-update'),
